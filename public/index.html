@@ -2284,6 +2284,7 @@ tbody tr:hover{
     <div class="employee-tools">
       <div class="employee-badge">
         🏢 Total Departments
+        <strong id="deptCount">0</strong>
       </div>
     </div>
 
@@ -2628,6 +2629,7 @@ async function dashboard() {
     $("totalEmp").textContent = data.employees;
     $("totalDept").textContent = data.departments;
     $("pendingLeave").textContent = data.pendingLeaves;
+    $("presentToday").textContent = data.presentToday;
 
   } catch (error) {
     console.error("Dashboard error:", error);
@@ -2787,6 +2789,8 @@ async function renderDepartments() {
     }
 
     const data = await response.json();
+
+    $("deptCount").textContent = data.length;
 
     // Database se sirf department names frontend array mein rakhenge
     departments = data.map(d => d.name);
