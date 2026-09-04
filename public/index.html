@@ -1,0 +1,3929 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Employee Management System - Ayush Sharma</title>
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:#f5f7fb;
+  color:#1e293b;
+}
+
+/* BUTTONS */
+button{
+  padding:10px 16px;
+  border:none;
+  border-radius:9px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+  margin:3px;
+  font-weight:600;
+  transition:0.25s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  background:#1d4ed8;
+  box-shadow:0 6px 16px rgba(37,99,235,.25);
+}
+
+button.red{
+  background:#ef4444;
+}
+
+button.red:hover{
+  background:#dc2626;
+}
+
+button.gray{
+  background:#64748b;
+}
+
+/* INPUTS */
+input,
+select{
+  width:100%;
+  padding:12px 14px;
+  margin:7px 0;
+  border:1px solid #dbe1ea;
+  border-radius:9px;
+  outline:none;
+  font-size:14px;
+  background:#fff;
+  transition:.2s;
+}
+
+input:focus,
+select:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.1);
+}
+
+/* LOGIN PAGE */
+.login{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top right,#3b82f6 0,transparent 30%),
+    linear-gradient(135deg,#0f172a,#1e3a8a);
+}
+
+.loginbox{
+  width:390px;
+  background:rgba(255,255,255,.97);
+  padding:38px;
+  border-radius:20px;
+  box-shadow:0 25px 60px rgba(0,0,0,.3);
+}
+
+.loginbox h2{
+  text-align:center;
+  color:#0f172a;
+  margin-bottom:8px;
+  font-size:27px;
+}
+
+.loginbox p{
+  margin-bottom:20px;
+  color:#64748b;
+}
+
+.loginbox button{
+  width:100%;
+  padding:13px;
+  margin-top:10px;
+  font-size:15px;
+}
+
+.loginbox small{
+  display:block;
+  text-align:center;
+  margin-top:15px;
+  color:#64748b;
+}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:250px;
+  padding:25px 15px;
+  background:linear-gradient(180deg,#0f172a,#172554);
+  color:white;
+  box-shadow:5px 0 25px rgba(15,23,42,.12);
+  overflow-y:auto;
+}
+
+.sidebar h2{
+  font-size:27px;
+  margin:0 12px 5px;
+}
+
+.sidebar p{
+  color:#94a3b8;
+  margin:0 12px 25px;
+  font-size:13px;
+}
+
+.sidebar button{
+  width:100%;
+  display:block;
+  background:transparent;
+  text-align:left;
+  padding:12px 14px;
+  margin:4px 0;
+  border-radius:9px;
+  color:#cbd5e1;
+  box-shadow:none;
+}
+
+.sidebar button:hover{
+  background:rgba(255,255,255,.1);
+  color:white;
+  transform:none;
+}
+
+#logoutBtn{
+  margin-top:20px;
+  color:#fca5a5;
+}
+
+/* MAIN */
+.main{
+  margin-left:250px;
+  padding:25px;
+}
+
+/* TOP BAR */
+.top{
+  background:white;
+  min-height:65px;
+  border-radius:14px;
+  padding:14px 20px;
+  margin-bottom:22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:0 4px 16px rgba(15,23,42,.06);
+}
+
+/* BOX */
+.box{
+  background:white;
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:20px;
+  box-shadow:0 5px 20px rgba(15,23,42,.06);
+}
+
+.box h2{
+  margin-bottom:12px;
+  color:#0f172a;
+}
+
+/* DASHBOARD CARDS */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  background:white;
+  border-radius:16px;
+  padding:22px;
+  min-height:130px;
+  box-shadow:0 5px 20px rgba(15,23,42,.07);
+  border:1px solid #eef2f7;
+  transition:.25s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 14px 30px rgba(15,23,42,.12);
+}
+
+.card b{
+  display:block;
+  color:#64748b;
+  font-size:14px;
+  margin-bottom:13px;
+}
+
+.card h2{
+  font-size:32px;
+  color:#0f172a;
+}
+
+.card::after{
+  content:"";
+  position:absolute;
+  width:80px;
+  height:80px;
+  right:-25px;
+  bottom:-25px;
+  border-radius:50%;
+  background:rgba(37,99,235,.08);
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:18px;
+  background:white;
+}
+
+th{
+  background:#f1f5f9;
+  color:#475569;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+th,
+td{
+  padding:13px;
+  border-bottom:1px solid #e8edf4;
+  text-align:left;
+}
+
+tbody tr{
+  transition:.2s;
+}
+
+tbody tr:hover{
+  background:#f8fafc;
+}
+
+/* PAGES */
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+  animation:fadeIn .25s ease;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(5px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.65);
+  backdrop-filter:blur(3px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+  padding:15px;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modalbox{
+  background:white;
+  padding:28px;
+  border-radius:16px;
+  width:min(600px,94%);
+  max-height:90vh;
+  overflow:auto;
+  box-shadow:0 25px 60px rgba(0,0,0,.25);
+}
+
+/* MOBILE */
+@media(max-width:1000px){
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:750px){
+
+  .sidebar{
+    position:relative;
+    width:100%;
+  }
+
+  .main{
+    margin-left:0;
+    padding:15px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .top{
+    gap:10px;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  table{
+    font-size:12px;
+  }
+
+  .box{
+    overflow-x:auto;
+  }
+}
+
+@media print{
+
+  .sidebar,
+  .top,
+  .no-print{
+    display:none!important;
+  }
+
+  .main{
+    margin:0;
+  }
+
+  .box{
+    box-shadow:none;
+  }
+}
+/* WELCOME PAGE */
+
+.welcome-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top right,#2563eb,transparent 35%),
+    linear-gradient(135deg,#020617,#172554);
+}
+
+.welcome-card{
+  width:min(650px,95%);
+  background:white;
+  padding:55px 45px;
+  text-align:center;
+  border-radius:24px;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);
+}
+
+.welcome-logo{
+  width:80px;
+  height:80px;
+  margin:0 auto 25px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:20px;
+  background:#2563eb;
+  color:white;
+  font-weight:800;
+  font-size:25px;
+}
+
+.welcome-card h1{
+  font-size:35px;
+  color:#0f172a;
+  margin-bottom:15px;
+}
+
+.welcome-card p{
+  color:#64748b;
+  font-size:16px;
+  line-height:1.7;
+  max-width:500px;
+  margin:0 auto 30px;
+}
+
+.welcome-buttons{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+}
+
+.welcome-buttons button{
+  min-width:160px;
+  padding:14px 20px;
+  font-size:15px;
+}
+
+.signup-btn{
+  background:#0f172a;
+}
+
+.signup-btn:hover{
+  background:#1e293b;
+}
+
+@media(max-width:600px){
+  .welcome-buttons{
+    flex-direction:column;
+  }
+
+  .welcome-buttons button{
+    width:100%;
+  }
+
+  .welcome-card{
+    padding:40px 25px;
+  }
+
+  .welcome-card h1{
+    font-size:27px;
+  }
+}
+/* ===== ATTRACTIVE DASHBOARD ===== */
+
+.dashboard-hero{
+  background: linear-gradient(135deg,#0f172a,#1d4ed8);
+  color:white;
+  border-radius:24px;
+  padding:28px;
+  margin-bottom:22px;
+  box-shadow:0 16px 35px rgba(15,23,42,.18);
+  display:flex;
+  justify-content:space-between;
+  gap:25px;
+  align-items:center;
+}
+
+.dashboard-hero h1{
+  margin:6px 0 10px;
+  font-size:30px;
+}
+
+.eyebrow{
+  font-size:13px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  opacity:.8;
+}
+
+.dashboard-subtitle{
+  max-width:560px;
+  line-height:1.6;
+  opacity:.9;
+}
+
+.student-info{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.18);
+  padding:18px;
+  border-radius:18px;
+  min-width:290px;
+}
+
+.student-info div{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin:8px 0;
+}
+
+.student-info span{
+  opacity:.75;
+  font-size:13px;
+}
+
+.student-info strong{
+  text-align:right;
+  font-size:14px;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+
+.stat-card{
+  background:#ffffff;
+  border-radius:20px;
+  padding:22px;
+  display:flex;
+  gap:16px;
+  align-items:center;
+  box-shadow:0 10px 28px rgba(15,23,42,.09);
+  border:1px solid #e8edf5;
+  transition:.25s ease;
+}
+
+.stat-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 18px 35px rgba(15,23,42,.14);
+}
+
+.stat-icon{
+  width:52px;
+  height:52px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  background:#eef4ff;
+}
+
+.stat-card p{
+  margin:0 0 8px;
+  color:#64748b;
+  font-size:14px;
+  font-weight:600;
+}
+
+.stat-card h2{
+  margin:0;
+  font-size:30px;
+  color:#0f172a;
+}
+
+@media(max-width:900px){
+  .dashboard-hero{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .dashboard-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .student-info{
+    min-width:auto;
+  }
+}
+
+@media(max-width:550px){
+  .dashboard-grid{
+    grid-template-columns:1fr;
+  }
+
+  .dashboard-hero h1{
+    font-size:24px;
+  }
+}
+/* ===== EMPLOYEES SECTION ===== */
+
+.employees-panel{
+  background:#ffffff;
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 12px 30px rgba(15,23,42,.08);
+  border:1px solid #e6ebf2;
+}
+
+.employees-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:22px;
+}
+
+.section-tag{
+  margin:0 0 5px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1.4px;
+  color:#2563eb;
+}
+
+.employees-header h2{
+  margin:0;
+  font-size:28px;
+  color:#0f172a;
+}
+
+.section-subtitle{
+  margin:6px 0 0;
+  color:#64748b;
+  font-size:14px;
+}
+
+.primary-action{
+  border:none;
+  border-radius:12px;
+  padding:12px 18px;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(37,99,235,.25);
+}
+
+.primary-action:hover{
+  transform:translateY(-2px);
+}
+
+.employee-tools{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.search-wrap{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#f8fafc;
+  border:1px solid #dbe3ee;
+  border-radius:12px;
+  padding:0 14px;
+}
+
+.search-wrap input{
+  width:100%;
+  border:none;
+  outline:none;
+  background:transparent;
+  padding:13px 0;
+  font-size:14px;
+}
+
+.employee-badge{
+  background:#eef4ff;
+  color:#1d4ed8;
+  font-weight:700;
+  font-size:13px;
+  padding:12px 15px;
+  border-radius:12px;
+  white-space:nowrap;
+}
+
+.employee-table-wrap{
+  overflow-x:auto;
+  border-radius:16px;
+  border:1px solid #e5e7eb;
+}
+
+#empTable table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+#empTable th{
+  background:#f8fafc;
+  color:#475569;
+  padding:14px;
+  text-align:left;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+#empTable td{
+  padding:15px 14px;
+  border-top:1px solid #eef2f7;
+}
+
+#empTable tr:hover td{
+  background:#f8fbff;
+}
+
+@media(max-width:700px){
+  .employees-header{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .employee-tools{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .primary-action{
+    width:100%;
+  }
+}
+/* ===== DEPARTMENTS SECTION POLISH ===== */
+
+#departments .employees-panel{
+  background:#ffffff;
+  border-radius:24px;
+  padding:26px;
+  box-shadow:0 14px 34px rgba(15,23,42,.08);
+  border:1px solid #e6ebf2;
+}
+
+#departments .employees-header{
+  margin-bottom:20px;
+}
+
+#departments .employee-badge{
+  background:linear-gradient(135deg,#eff6ff,#e0ecff);
+  color:#1d4ed8;
+  border:1px solid #d7e5ff;
+  box-shadow:0 6px 16px rgba(37,99,235,.08);
+}
+
+#departments .employee-table-wrap{
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  overflow:hidden;
+  background:#fff;
+}
+
+#deptTable table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+#deptTable th{
+  background:#f8fafc;
+  color:#475569;
+  padding:15px 16px;
+  text-align:left;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+}
+
+#deptTable td{
+  padding:16px;
+  border-top:1px solid #eef2f7;
+  color:#334155;
+}
+
+#deptTable tr:hover td{
+  background:#f8fbff;
+}
+
+#deptTable button{
+  border:none;
+  border-radius:9px;
+  padding:8px 13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+#deptTable button:hover{
+  transform:translateY(-1px);
+}
+
+#deptTable button:first-of-type{
+  background:#2563eb;
+  color:white;
+  box-shadow:0 5px 12px rgba(37,99,235,.18);
+}
+
+#deptTable button:last-of-type{
+  background:#ef4444;
+  color:white;
+  box-shadow:0 5px 12px rgba(239,68,68,.16);
+  margin-left:8px;
+}
+
+#departments .primary-action{
+  padding:12px 20px;
+  border-radius:12px;
+}
+
+@media(max-width:700px){
+  #departments .employees-panel{
+    padding:18px;
+  }
+
+  #deptTable th,
+  #deptTable td{
+    padding:12px;
+  }
+}
+/* ===== ATTENDANCE SECTION ===== */
+
+.attendance-panel{
+  background:#ffffff;
+  border-radius:24px;
+  padding:26px;
+  box-shadow:0 14px 34px rgba(15,23,42,.08);
+  border:1px solid #e6ebf2;
+}
+
+.attendance-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:22px;
+}
+
+.attendance-header h2{
+  margin:0;
+  font-size:28px;
+  color:#0f172a;
+}
+
+.attendance-badge{
+  background:linear-gradient(135deg,#eff6ff,#e0ecff);
+  color:#1d4ed8;
+  border:1px solid #d7e5ff;
+  padding:12px 16px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.attendance-filters{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:18px;
+}
+
+.attendance-field{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.attendance-field label{
+  font-size:13px;
+  font-weight:700;
+  color:#475569;
+}
+
+.attendance-field select{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #dbe3ee;
+  border-radius:12px;
+  background:#f8fafc;
+  outline:none;
+  font-size:14px;
+}
+
+.attendance-field select:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.10);
+}
+
+.selected-date-card{
+  background:linear-gradient(135deg,#f8fafc,#eef4ff);
+  border:1px solid #dfe7f2;
+  border-radius:16px;
+  padding:16px 18px;
+  margin-bottom:18px;
+  color:#334155;
+  line-height:1.6;
+}
+
+.attendance-actions{
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.danger-action{
+  border:none;
+  border-radius:12px;
+  padding:12px 18px;
+  background:#ef4444;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(239,68,68,.18);
+}
+
+.danger-action:hover{
+  transform:translateY(-2px);
+}
+
+.attendance-table-wrap{
+  overflow-x:auto;
+  border-radius:16px;
+  border:1px solid #e5e7eb;
+}
+
+#attTable table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+#attTable th{
+  background:#f8fafc;
+  color:#475569;
+  padding:14px;
+  text-align:left;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+#attTable td{
+  padding:14px;
+  border-top:1px solid #eef2f7;
+}
+
+#attTable tr:hover td{
+  background:#f8fbff;
+}
+
+@media(max-width:700px){
+  .attendance-header{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .attendance-filters{
+    grid-template-columns:1fr;
+  }
+
+  .attendance-actions{
+    flex-direction:column;
+  }
+
+  .attendance-actions button{
+    width:100%;
+  }
+}
+/* ===== LEAVE SECTION ===== */
+
+.leave-panel{
+  background:#ffffff;
+  border-radius:24px;
+  padding:26px;
+  box-shadow:0 14px 34px rgba(15,23,42,.08);
+  border:1px solid #e6ebf2;
+}
+
+.leave-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:22px;
+}
+
+.leave-header h2{
+  margin:0;
+  font-size:28px;
+  color:#0f172a;
+}
+
+.leave-summary{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  margin-bottom:20px;
+}
+
+.leave-summary-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:18px;
+  background:linear-gradient(135deg,#f8fafc,#eef4ff);
+  border:1px solid #dfe7f2;
+  border-radius:16px;
+}
+
+.leave-summary-card span{
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#ffffff;
+  border-radius:12px;
+  font-size:22px;
+}
+
+.leave-summary-card p{
+  margin:0 0 4px;
+  color:#64748b;
+  font-size:13px;
+  font-weight:600;
+}
+
+.leave-summary-card strong{
+  color:#0f172a;
+  font-size:14px;
+}
+
+.leave-table-wrap{
+  overflow-x:auto;
+  border-radius:16px;
+  border:1px solid #e5e7eb;
+}
+
+#leaveTable table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+#leaveTable th{
+  background:#f8fafc;
+  color:#475569;
+  padding:14px;
+  text-align:left;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+#leaveTable td{
+  padding:14px;
+  border-top:1px solid #eef2f7;
+}
+
+#leaveTable tr:hover td{
+  background:#f8fbff;
+}
+
+@media(max-width:700px){
+  .leave-header{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .leave-summary{
+    grid-template-columns:1fr;
+  }
+
+  #leave .primary-action{
+    width:100%;
+  }
+}
+/* ===== PAYROLL POLISH ===== */
+
+#payroll .payroll-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:20px;
+}
+
+#payroll .payroll-header h2{
+  margin:0;
+  font-size:28px;
+  color:#172033;
+}
+
+#payroll .payroll-subtitle{
+  margin-top:6px;
+  color:#64748b;
+  font-size:14px;
+}
+
+#payroll .payroll-card{
+  background:linear-gradient(135deg,#ffffff,#f8faff);
+  border:1px solid #dfe7f2;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:18px;
+}
+
+#payroll #payMonth{
+  width:100%;
+  padding:13px 15px;
+  border:1px solid #d7deea;
+  border-radius:10px;
+  background:#fff;
+  font-size:14px;
+  outline:none;
+}
+
+#payroll #payMonth:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+}
+
+#payroll .payroll-table-wrap{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  overflow:hidden;
+  margin-top:18px;
+}
+
+#payroll table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+#payroll th{
+  background:#f1f5f9;
+  padding:14px;
+  text-align:left;
+  font-size:12px;
+  color:#475569;
+  text-transform:uppercase;
+}
+
+#payroll td{
+  padding:14px;
+  border-top:1px solid #edf2f7;
+  color:#334155;
+}
+
+#payroll tbody tr:hover{
+  background:#f8fbff;
+}
+
+@media(max-width:700px){
+  #payroll .payroll-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  #payroll .payroll-table-wrap{
+    overflow-x:auto;
+  }
+}
+/* ================================
+   SALARY SLIP PAGE
+================================ */
+
+#slip {
+  padding: 25px;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+
+/* Header */
+
+.salary-header {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+
+  padding: 28px 32px;
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.18);
+}
+
+.page-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.salary-header h1 {
+  margin: 7px 0;
+  font-size: 30px;
+}
+
+.salary-header p {
+  margin: 0;
+  opacity: 0.85;
+  font-size: 14px;
+}
+
+.salary-icon {
+  width: 65px;
+  height: 65px;
+
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 32px;
+
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(5px);
+}
+
+
+/* Controls */
+
+.salary-controls {
+  background: white;
+
+  padding: 24px;
+
+  border-radius: 16px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(200px, 1fr)
+    minmax(200px, 1fr)
+    auto;
+
+  gap: 18px;
+
+  align-items: end;
+
+  margin-bottom: 22px;
+
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+}
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+}
+
+
+#slipEmp,
+#slipMonth {
+
+  width: 100%;
+
+  padding: 13px 15px;
+
+  border: 1px solid #dbe2ea;
+
+  border-radius: 10px;
+
+  background: #fff;
+
+  color: #1f2937;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition: 0.2s;
+}
+
+
+#slipEmp:focus,
+#slipMonth:focus {
+
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37,99,235,0.12);
+}
+
+
+/* Print Button */
+
+#printSlip {
+
+  height: 45px;
+
+  padding: 0 20px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+
+  white-space: nowrap;
+}
+
+
+#printSlip:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 7px 18px rgba(37,99,235,0.25);
+}
+
+
+#printSlip:active {
+  transform: translateY(0);
+}
+
+
+/* Salary Slip */
+
+.salary-slip {
+
+  background: white;
+
+  border-radius: 16px;
+
+  min-height: 330px;
+
+  padding: 30px;
+
+  box-shadow:
+    0 5px 20px rgba(0,0,0,0.06);
+}
+
+
+/* Empty State */
+
+.empty-slip {
+
+  min-height: 270px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  text-align: center;
+
+  color: #6b7280;
+}
+
+
+.empty-icon {
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eff6ff;
+
+  font-size: 32px;
+
+  margin-bottom: 15px;
+}
+
+
+.empty-slip h2 {
+
+  margin: 0 0 8px;
+
+  color: #1f2937;
+
+  font-size: 20px;
+}
+
+
+.empty-slip p {
+
+  margin: 0;
+
+  font-size: 14px;
+}
+
+
+/* Generated Slip */
+
+.generated-slip {
+
+  max-width: 900px;
+
+  margin: auto;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  background: white;
+}
+
+
+.slip-top {
+
+  background: linear-gradient(
+    135deg,
+    #1e3a8a,
+    #2563eb
+  );
+
+  color: white;
+
+  padding: 25px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+
+.slip-top h2 {
+  margin: 0 0 5px;
+}
+
+.slip-top p {
+  margin: 0;
+  opacity: 0.85;
+  font-size: 13px;
+}
+
+
+.slip-month {
+
+  background: white;
+
+  color: #1d4ed8;
+
+  padding: 9px 14px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+
+/* Employee Info */
+
+.employee-info {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 15px;
+
+  padding: 22px;
+
+  background: #f8fafc;
+}
+
+
+.info-box {
+
+  padding: 15px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+}
+
+
+.info-box span {
+
+  display: block;
+
+  color: #6b7280;
+
+  font-size: 12px;
+
+  margin-bottom: 5px;
+}
+
+
+.info-box strong {
+
+  color: #111827;
+
+  font-size: 14px;
+}
+
+
+/* Salary Tables */
+
+.salary-section {
+
+  padding: 22px;
+}
+
+
+.salary-section h3 {
+
+  margin: 0 0 14px;
+
+  font-size: 16px;
+
+  color: #1f2937;
+}
+
+
+.salary-table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+
+.salary-table th,
+.salary-table td {
+
+  padding: 12px 14px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  text-align: left;
+
+  font-size: 13px;
+}
+
+
+.salary-table th {
+
+  background: #f8fafc;
+
+  color: #374151;
+}
+
+
+.salary-table td:last-child,
+.salary-table th:last-child {
+
+  text-align: right;
+}
+
+
+.net-salary {
+
+  margin: 0 22px 22px;
+
+  padding: 20px;
+
+  border-radius: 12px;
+
+  background: #ecfdf5;
+
+  border: 1px solid #bbf7d0;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+
+.net-salary span {
+
+  font-size: 14px;
+
+  color: #166534;
+
+  font-weight: 600;
+}
+
+
+.net-salary strong {
+
+  font-size: 24px;
+
+  color: #15803d;
+}
+
+
+/* Responsive */
+
+@media (max-width: 800px) {
+
+  .salary-controls {
+
+    grid-template-columns: 1fr;
+  }
+
+  .employee-info {
+
+    grid-template-columns: 1fr;
+  }
+
+  .salary-header {
+
+    padding: 22px;
+  }
+
+  .salary-header h1 {
+
+    font-size: 24px;
+  }
+
+  .salary-slip {
+
+    padding: 15px;
+  }
+}
+
+
+/* Print */
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  #slipView,
+  #slipView * {
+    visibility: visible;
+  }
+
+  #slipView {
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+
+    box-shadow: none;
+  }
+
+  .generated-slip {
+    border: none;
+  }
+}
+/* =====================================
+   REPORTS PAGE
+===================================== */
+
+#reports {
+  padding: 30px;
+  min-height: calc(100vh - 60px);
+  background: #f5f7fb;
+}
+
+
+/* ---------- HEADER ---------- */
+
+.reports-header {
+  background: #ffffff;
+  border-radius: 18px;
+
+  padding: 25px 30px;
+  margin-bottom: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
+}
+
+
+.reports-tag {
+  display: inline-block;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 1.5px;
+
+  color: #2563eb;
+}
+
+
+.reports-header h1 {
+  margin: 7px 0;
+
+  font-size: 30px;
+  color: #111827;
+}
+
+
+.reports-header p {
+  margin: 0;
+
+  font-size: 14px;
+  color: #6b7280;
+}
+
+
+/* Header Icon */
+
+.reports-icon {
+  width: 60px;
+  height: 60px;
+
+  border-radius: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 27px;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #4f46e5
+  );
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+
+/* ---------- MAIN CARD ---------- */
+
+.reports-card {
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 28px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.07);
+}
+
+
+/* Card Header */
+
+.reports-card-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 20px;
+
+  margin-bottom: 25px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+.reports-card-header h2 {
+  margin: 0 0 6px;
+
+  font-size: 21px;
+  color: #111827;
+}
+
+
+.reports-card-header p {
+  margin: 0;
+
+  font-size: 14px;
+  color: #6b7280;
+}
+
+
+/* Status */
+
+.report-status {
+  padding: 8px 14px;
+
+  border-radius: 20px;
+
+  background: #ecfdf5;
+
+  color: #059669;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* ---------- EXPORT GRID ---------- */
+
+.export-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+
+/* Export Box */
+
+.export-box {
+  padding: 24px;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 16px;
+
+  background: #fafbff;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 18px;
+
+  transition: all 0.25s ease;
+}
+
+
+.export-box:hover {
+  transform: translateY(-4px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 10px 25px rgba(37, 99, 235, 0.10);
+
+  background: #ffffff;
+}
+
+
+/* Icons */
+
+.export-icon {
+  width: 52px;
+  height: 52px;
+
+  min-width: 52px;
+
+  border-radius: 14px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 23px;
+}
+
+
+.employee-icon {
+  background: #e0ecff;
+}
+
+
+.payroll-icon {
+  background: #dcfce7;
+}
+
+
+/* Content */
+
+.export-content h3 {
+  margin: 0 0 8px;
+
+  font-size: 18px;
+
+  color: #111827;
+}
+
+
+.export-content p {
+  margin: 0 0 18px;
+
+  color: #6b7280;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+
+/* ---------- BUTTONS ---------- */
+
+.export-btn {
+  border: none;
+
+  padding: 11px 17px;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  transition: all 0.2s ease;
+}
+
+
+.export-btn span {
+  font-size: 15px;
+}
+
+
+/* Employee */
+
+.employee-btn {
+  background: #2563eb;
+
+  box-shadow:
+    0 5px 12px rgba(37, 99, 235, 0.20);
+}
+
+
+.employee-btn:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.30);
+}
+
+
+/* Payroll */
+
+.payroll-btn {
+  background: #059669;
+
+  box-shadow:
+    0 5px 12px rgba(5, 150, 105, 0.20);
+}
+
+
+.payroll-btn:hover {
+  background: #047857;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 18px rgba(5, 150, 105, 0.30);
+}
+
+
+/* ---------- INFO BOX ---------- */
+
+.reports-info {
+  margin-top: 25px;
+
+  padding: 16px 18px;
+
+  border-radius: 12px;
+
+  background: #eff6ff;
+
+  border: 1px solid #dbeafe;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  color: #1e40af;
+}
+
+
+.reports-info > span {
+  font-size: 18px;
+}
+
+
+.reports-info strong {
+  font-size: 13px;
+}
+
+
+.reports-info p {
+  margin: 4px 0 0;
+
+  font-size: 12px;
+
+  color: #64748b;
+
+  line-height: 1.5;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 750px) {
+
+  #reports {
+    padding: 15px;
+  }
+
+  .reports-header {
+    padding: 20px;
+  }
+
+  .reports-header h1 {
+    font-size: 24px;
+  }
+
+  .export-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reports-card {
+    padding: 20px;
+  }
+
+  .reports-card-header {
+    align-items: flex-start;
+
+    gap: 15px;
+  }
+
+}
+</style>
+</head>
+<body>
+<div id="welcomeScreen" class="welcome-screen">
+
+  <div class="welcome-card">
+
+    <div class="welcome-logo">EMS</div>
+
+    <h1>Employee Management System</h1>
+
+    <p>
+      Manage employees, attendance, departments,
+      leave and payroll from one place.
+    </p>
+
+    <div class="welcome-buttons">
+
+      <button id="openLogin">
+        Sign In
+      </button>
+
+      <button id="openSignup" class="signup-btn">
+        Create Account
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+<div id="signupScreen" class="login" style="display:none">
+
+  <div class="loginbox">
+
+    <h2>Create Account</h2>
+
+    <p style="text-align:center;">
+      Register a new EMS account
+    </p>
+
+    <input
+      type="text"
+      id="signupName"
+      placeholder="Full Name"
+    >
+
+    <input
+      type="text"
+      id="signupUser"
+      placeholder="Username"
+    >
+
+    <input
+      type="email"
+      id="signupEmail"
+      placeholder="Email"
+    >
+
+    <input
+      type="password"
+      id="signupPass"
+      placeholder="Password"
+    >
+
+    <input
+      type="password"
+      id="signupConfirmPass"
+      placeholder="Confirm Password"
+    >
+
+    <button id="signupBtn">
+      Create Account
+    </button>
+
+    <button
+      id="backToWelcome"
+      class="gray"
+      style="width:100%;"
+    >
+      Back
+    </button>
+
+    <p
+      id="signupMsg"
+      style="text-align:center;margin-top:12px;"
+    ></p>
+
+  </div>
+
+</div>
+<div id="loginScreen" class="login" style="display:none"><div class="loginbox"><h2>Employee Management System</h2><p style="text-align:center">PIET College • BCA 5th Semester</p><input id="loginUser" placeholder="Username"><input id="loginPass" type="password" placeholder="Password"><button id="loginBtn" style="width:100%">Login</button><p id="loginMsg" style="color:#b42318"></p></div></div>
+<div id="app" style="display:none">
+<aside class="sidebar"><h2>EMS</h2><p>Ayush Sharma</p><button data-page="dashboard">🏠 Dashboard</button><button data-page="employees">👥 Employees</button><button data-page="departments">🏢 Departments</button><button data-page="attendance">🕒 Attendance</button><button data-page="leave">📅 Leave</button><button data-page="payroll">💰 Payroll</button><button data-page="slip">🧾 Salary Slip</button><button data-page="reports">📊 Reports</button><button id="logoutBtn">🚪 Logout</button></aside>
+<main class="main"><div class="top no-print"><button id="backBtn" class="gray">↩ Back</button><b id="loggedUser">Welcome User</b></div>
+<section id="dashboard" class="page active">
+  <div class="dashboard-hero">
+    <div>
+      <p class="eyebrow">EMS Dashboard</p>
+      <h1>Employee Management System</h1>
+      <p class="dashboard-subtitle">
+        Manage employees, departments, attendance, leave and payroll from one place.
+      </p>
+    </div>
+
+    <div class="student-info">
+      <div><span>Name</span><strong>Ayush Sharma</strong></div>
+      <div><span>Roll No.</span><strong>241433</strong></div>
+      <div><span>University Roll No.</span><strong>00240405040116</strong></div>
+      <div><span>College</span><strong>PIET College • BCA 5th Semester</strong></div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div>
+        <p>Total Employees</p>
+        <h2 id="totalEmp">0</h2>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🏢</div>
+      <div>
+        <p>Departments</p>
+        <h2 id="totalDept">0</h2>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div>
+        <p>Present Today</p>
+        <h2 id="presentToday">0</h2>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🕒</div>
+      <div>
+        <p>Pending Leaves</p>
+        <h2 id="pendingLeave">0</h2>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="employees" class="page">
+  <div class="employees-panel">
+
+    <div class="employees-header">
+      <div>
+        <p class="section-tag">Employee Directory</p>
+        <h2>Employees</h2>
+        <p class="section-subtitle">
+          Add, search and manage employee records.
+        </p>
+      </div>
+
+      <button id="addEmp" class="primary-action">
+        + Add Employee
+      </button>
+    </div>
+
+    <div class="employee-tools">
+      <div class="search-wrap">
+        <span>🔎</span>
+        <input
+          id="empSearch"
+          type="text"
+          placeholder="Search employee by name or ID"
+        >
+      </div>
+
+      <div class="employee-badge">
+        👥 Employee Records
+      </div>
+    </div>
+
+    <div class="employee-table-wrap">
+      <div id="empTable"></div>
+    </div>
+
+  </div>
+</section>
+<section id="departments" class="page">
+  <div class="employees-panel">
+
+    <div class="employees-header">
+      <div>
+        <p class="section-tag">Department Directory</p>
+        <h2>Departments</h2>
+        <p class="section-subtitle">
+          Manage departments and view employee distribution.
+        </p>
+      </div>
+
+      <button id="addDept" class="primary-action">
+        + Add Department
+      </button>
+    </div>
+
+    <div class="employee-tools">
+      <div class="employee-badge">
+        🏢 Total Departments
+      </div>
+    </div>
+
+    <div class="employee-table-wrap">
+      <div id="deptTable"></div>
+    </div>
+
+  </div>
+</section>
+<section id="attendance" class="page">
+  <div class="attendance-panel">
+
+    <div class="attendance-header">
+      <div>
+        <p class="section-tag">Attendance Tracker</p>
+        <h2>Attendance Management</h2>
+        <p class="section-subtitle">
+          Select a date and manage employee attendance easily.
+        </p>
+      </div>
+
+      <div class="attendance-badge">
+        📅 Daily Attendance
+      </div>
+    </div>
+
+    <div class="attendance-filters">
+      <div class="attendance-field">
+        <label>Month</label>
+        <select id="attMonth"></select>
+      </div>
+
+      <div class="attendance-field">
+        <label>Day</label>
+        <select id="attDay"></select>
+      </div>
+    </div>
+
+    <div id="selectedDate" class="selected-date-card"></div>
+
+    <div class="attendance-actions">
+      <button id="allPresent" class="primary-action">
+        ✓ Mark All Present
+      </button>
+
+      <button id="resetAttendance" class="danger-action">
+        ↻ Reset Month
+      </button>
+    </div>
+
+    <div class="attendance-table-wrap">
+      <div id="attTable"></div>
+    </div>
+
+  </div>
+</section>
+<section id="leave" class="page">
+  <div class="leave-panel">
+
+    <div class="leave-header">
+      <div>
+        <p class="section-tag">Leave Management</p>
+        <h2>Employee Leave Requests</h2>
+        <p class="section-subtitle">
+          Apply, review and manage employee leave requests.
+        </p>
+      </div>
+
+      <button id="addLeave" class="primary-action">
+        + Apply Leave
+      </button>
+    </div>
+
+    <div class="leave-summary">
+      <div class="leave-summary-card">
+        <span>📄</span>
+        <div>
+          <p>Leave Records</p>
+          <strong>Manage all requests</strong>
+        </div>
+      </div>
+
+      <div class="leave-summary-card">
+        <span>⏳</span>
+        <div>
+          <p>Status Tracking</p>
+          <strong>Pending / Approved</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="leave-table-wrap">
+      <div id="leaveTable"></div>
+    </div>
+
+  </div>
+</section>
+<section id="payroll" class="page">
+  <div class="payroll-panel">
+
+    <div class="payroll-header">
+      <div>
+        <p class="section-tag">PAYROLL MANAGEMENT</p>
+        <h2>Month-wise Payroll</h2>
+        <p class="section-subtitle">
+          View and manage employee payroll records by month.
+        </p>
+      </div>
+
+      <div class="payroll-badge">
+        💰 Payroll Overview
+      </div>
+    </div>
+
+    <div class="payroll-filter">
+      <label for="payMonth">Select Payroll Month</label>
+      <select id="payMonth"></select>
+    </div>
+
+    <div class="payroll-summary">
+      <div class="payroll-summary-card">
+        <span>👥</span>
+        <div>
+          <p>Employees</p>
+          <strong>Monthly Records</strong>
+        </div>
+      </div>
+
+      <div class="payroll-summary-card">
+        <span>💳</span>
+        <div>
+          <p>Payroll</p>
+          <strong>Salary Overview</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="payroll-table-wrap">
+      <div id="payTable"></div>
+    </div>
+
+  </div>
+</section>
+<section id="slip" class="page">
+
+  <div class="salary-header">
+    <div>
+      <span class="page-label">PAYROLL MANAGEMENT</span>
+      <h1>Salary Slip</h1>
+      <p>Generate and print employee salary details</p>
+    </div>
+
+    <div class="salary-icon">
+      💰
+    </div>
+  </div>
+
+  <div class="salary-controls">
+
+    <div class="form-group">
+      <label for="slipEmp">Employee</label>
+
+      <select id="slipEmp">
+        <option value="">Select Employee</option>
+      </select>
+    </div>
+
+
+    <div class="form-group">
+      <label for="slipMonth">Salary Month</label>
+
+      <select id="slipMonth">
+        <option value="">Select Month</option>
+        <option value="January 2026">January 2026</option>
+        <option value="February 2026">February 2026</option>
+        <option value="March 2026">March 2026</option>
+        <option value="April 2026">April 2026</option>
+        <option value="May 2026">May 2026</option>
+        <option value="June 2026">June 2026</option>
+        <option value="July 2026">July 2026</option>
+        <option value="August 2026">August 2026</option>
+        <option value="September 2026">September 2026</option>
+        <option value="October 2026">October 2026</option>
+        <option value="November 2026">November 2026</option>
+        <option value="December 2026">December 2026</option>
+      </select>
+    </div>
+
+    <button id="printSlip" class="print-btn">
+      🖨️ Print Salary Slip
+    </button>
+
+  </div>
+
+
+  <!-- Salary Slip Preview -->
+  <div id="slipView" class="salary-slip">
+
+    <div class="empty-slip">
+
+      <div class="empty-icon">📄</div>
+
+      <h2>Salary Slip Preview</h2>
+
+      <p>
+        Select an employee and salary month to view
+        the salary slip.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+<section id="reports" class="page">
+
+  <div class="reports-header">
+    <div>
+      <span class="reports-tag">REPORTS & ANALYTICS</span>
+      <h1>Reports</h1>
+      <p>Export employee and payroll information in CSV format.</p>
+    </div>
+
+    <div class="reports-icon">
+      📊
+    </div>
+  </div>
+
+
+  <div class="reports-card">
+
+    <div class="reports-card-header">
+      <div>
+        <h2>Data Export</h2>
+        <p>Download your system data whenever you need it.</p>
+      </div>
+
+      <span class="report-status">
+        ● Ready
+      </span>
+    </div>
+
+
+    <div class="export-grid">
+
+      <!-- Employee Report -->
+      <div class="export-box">
+
+        <div class="export-icon employee-icon">
+          👥
+        </div>
+
+        <div class="export-content">
+          <h3>Employee Report</h3>
+
+          <p>
+            Export complete employee information
+            into a CSV file.
+          </p>
+
+          <button id="exportEmp" class="export-btn employee-btn">
+            <span>⬇</span>
+            Export Employees CSV
+          </button>
+        </div>
+
+      </div>
+
+
+      <!-- Payroll Report -->
+      <div class="export-box">
+
+        <div class="export-icon payroll-icon">
+          💰
+        </div>
+
+        <div class="export-content">
+          <h3>Payroll Report</h3>
+
+          <p>
+            Export payroll and salary information
+            into a CSV file.
+          </p>
+
+          <button id="exportPay" class="export-btn payroll-btn">
+            <span>⬇</span>
+            Export Payroll CSV
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="reports-info">
+      <span>ℹ️</span>
+      <div>
+        <strong>CSV Export</strong>
+        <p>
+          Your reports will be downloaded in CSV format,
+          which can be opened in Excel or Google Sheets.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+</main></div>
+<div id="modal" class="modal"><div id="modalBox" class="modalbox"></div></div>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+let employees=JSON.parse(localStorage.getItem("emsE")||"[]");
+let departments=JSON.parse(localStorage.getItem("emsD")||'["HR","IT","Finance","Sales","Marketing"]');
+let attendance=JSON.parse(localStorage.getItem("emsA")||"{}");
+let leaves=JSON.parse(localStorage.getItem("emsL")||"[]");
+let payroll=JSON.parse(localStorage.getItem("emsP")||"{}");
+let history=["dashboard"];
+
+function save(){localStorage.setItem("emsE",JSON.stringify(employees));localStorage.setItem("emsD",JSON.stringify(departments));localStorage.setItem("emsA",JSON.stringify(attendance));localStorage.setItem("emsL",JSON.stringify(leaves));localStorage.setItem("emsP",JSON.stringify(payroll))}
+function money(n){return "₹"+Math.round(Number(n)||0).toLocaleString("en-IN")}
+function months(){let a=[],d=new Date();for(let i=0;i<12;i++){let x=new Date(d.getFullYear(),d.getMonth()-i,1),v=x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0");a.push([v,x.toLocaleDateString("en-IN",{month:"long",year:"numeric"})])}return a}
+function monthDays(m){let [y,mo]=m.split("-").map(Number);return new Date(y,mo,0).getDate()}
+function table(head,rows){if(!rows.length)return "<p>No records found.</p>";return "<table><thead><tr>"+head.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+r.map(v=>"<td>"+v+"</td>").join("")+"</tr>").join("")+"</tbody></table>"}
+function modal(html){$("modalBox").innerHTML=html;$("modal").classList.add("show")}
+function closeModal(){$("modal").classList.remove("show")}
+function go(id,record=true){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(id).classList.add("active");if(record&&history[history.length-1]!==id)history.push(id);render(id)}
+function render(id){dashboard();if(id==="employees")renderEmployees();if(id==="departments")renderDepartments();if(id==="attendance")initAttendance();if(id==="leave")renderLeaves();if(id==="payroll")initPayroll();if(id==="slip")initSlip()}
+async function dashboard() {
+  try {
+    const response = await fetch("/api/dashboard");
+
+    if (!response.ok) {
+      throw new Error("Failed to load dashboard");
+    }
+
+    const data = await response.json();
+
+    $("totalEmp").textContent = data.employees;
+    $("totalDept").textContent = data.departments;
+    $("pendingLeave").textContent = data.pendingLeaves;
+
+  } catch (error) {
+    console.error("Dashboard error:", error);
+  }
+}
+async function renderEmployees() {
+  try {
+    const response = await fetch("/api/employees");
+
+    if (!response.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await response.json();
+
+    let q = ($("empSearch").value || "").toLowerCase();
+
+    let rows = employees
+      .filter(e =>
+        (e.id + " " + e.name + " " + e.dept + " " + e.role)
+          .toLowerCase()
+          .includes(q)
+      )
+      .map(e => [
+        e.id,
+        e.name,
+        e.dept,
+        e.role,
+        money(e.salary),
+        '<button data-edit="' + e.id + '">Edit</button>' +
+        '<button class="red" data-del="' + e.id + '">Delete</button>'
+      ]);
+
+    $("empTable").innerHTML = table(
+      ["ID", "Name", "Department", "Designation", "Monthly Salary", "Actions"],
+      rows
+    );
+
+    $("empTable")
+      .querySelectorAll("[data-edit]")
+      .forEach(b => {
+        b.onclick = () => employeeForm(b.dataset.edit);
+      });
+
+    $("empTable")
+      .querySelectorAll("[data-del]")
+      .forEach(b => {
+        b.onclick = async () => {
+          if (!confirm("Delete employee?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/employees/" + encodeURIComponent(b.dataset.del),
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Delete failed");
+            }
+
+            await renderEmployees();
+            await dashboard();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error(error);
+    $("empTable").innerHTML =
+      "<p>Unable to load employees from server.</p>";
+  }
+}
+async function employeeForm(id) {
+  let e = employees.find(x => x.id === id) || {
+    id: "",
+    name: "",
+    dept: departments[0] || "",
+    role: "",
+    salary: 30000
+  };
+
+  modal(
+    '<h2>' + (id ? "Edit" : "Add") + ' Employee</h2>' +
+    '<form id="employeeForm">' +
+    '<input name="id" value="' + e.id + '" placeholder="Employee ID" ' +
+    (id ? "readonly" : "") + ' required>' +
+    '<input name="name" value="' + e.name + '" placeholder="Name" required>' +
+    '<select name="dept">' +
+    departments.map(d =>
+      '<option ' + (d === e.dept ? "selected" : "") + '>' +
+      d +
+      '</option>'
+    ).join("") +
+    '</select>' +
+    '<input name="role" value="' + e.role + '" placeholder="Designation" required>' +
+    '<input name="salary" type="number" value="' + e.salary +
+    '" placeholder="Monthly Salary" required>' +
+    '<button>Save</button>' +
+    '</form>'
+  );
+
+  $("employeeForm").onsubmit = async function (ev) {
+    ev.preventDefault();
+
+    const f = new FormData(this);
+
+    const employee = {
+      id: f.get("id"),
+      name: f.get("name"),
+      dept: f.get("dept"),
+      role: f.get("role"),
+      salary: Number(f.get("salary")) || 0
+    };
+
+    try {
+      const response = await fetch(
+        id
+          ? "/api/employees/" + encodeURIComponent(id)
+          : "/api/employees",
+        {
+          method: id ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(employee)
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to save employee");
+      }
+
+      closeModal();
+
+      await renderEmployees();
+      await dashboard();
+
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+}
+async function renderDepartments() {
+  try {
+    const response = await fetch("/api/departments");
+
+    if (!response.ok) {
+      throw new Error("Failed to load departments");
+    }
+
+    const data = await response.json();
+
+    // Database se sirf department names frontend array mein rakhenge
+    departments = data.map(d => d.name);
+
+    const rows = data.map(d => [
+      d.name,
+      employees.filter(e => e.dept === d.name).length,
+      '<button data-e="' + d.id + '">Edit</button>' +
+      '<button class="red" data-d="' + d.id + '">Delete</button>'
+    ]);
+
+    $("deptTable").innerHTML = table(
+      ["Department", "Employees", "Actions"],
+      rows
+    );
+
+    $("deptTable")
+      .querySelectorAll("[data-e]")
+      .forEach(b => {
+        b.onclick = () => deptForm(Number(b.dataset.e));
+      });
+
+    $("deptTable")
+      .querySelectorAll("[data-d]")
+      .forEach(b => {
+        b.onclick = async () => {
+          const id = Number(b.dataset.d);
+
+          if (!confirm("Delete department?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/departments/" + id,
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Delete failed");
+            }
+
+            await renderDepartments();
+            await renderEmployees();
+            await dashboard();
+
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error(error);
+
+    $("deptTable").innerHTML =
+      "<p>Unable to load departments from server.</p>";
+  }
+}
+async function deptForm(id) {
+  let old = "";
+
+  if (id) {
+    try {
+      const response = await fetch("/api/departments");
+
+      if (!response.ok) {
+        throw new Error("Failed to load department");
+      }
+
+      const data = await response.json();
+      const department = data.find(d => Number(d.id) === Number(id));
+
+      if (department) {
+        old = department.name;
+      }
+
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+  }
+
+  modal(
+    '<h2>' + (id ? "Edit Department" : "Add Department") + '</h2>' +
+    '<form id="deptForm">' +
+    '<input name="name" value="' + old + '" ' +
+    'placeholder="Department Name" required>' +
+    '<button>Save</button>' +
+    '</form>'
+  );
+
+  $("deptForm").onsubmit = async function (ev) {
+    ev.preventDefault();
+
+    const name = new FormData(this)
+      .get("name")
+      .trim();
+
+    if (!name) {
+      alert("Department name is required");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        id
+          ? "/api/departments/" + id
+          : "/api/departments",
+        {
+          method: id ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to save department"
+        );
+      }
+
+      closeModal();
+
+      await renderDepartments();
+      await renderEmployees();
+      await dashboard();
+
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+}
+function initAttendance(){$("attMonth").innerHTML=months().map(x=>'<option value="'+x[0]+'">'+x[1]+"</option>").join("");updateAttendanceDays()}
+function updateAttendanceDays(){let m=$("attMonth").value,n=monthDays(m),old=+$("attDay").value||1;$("attDay").innerHTML=Array.from({length:n},(_,i)=>"<option value='"+(i+1)+"'>"+(i+1)+"</option>").join("");$("attDay").value=old<=n?old:1;renderAttendance()}
+function attendanceDate(){return $("attMonth").value+"-"+String($("attDay").value).padStart(2,"0")}
+function code(s){return {Present:"PR",Absent:"AB","Paid Leave":"PL","Weekly Off":"WO","Half Day":"HD","On Duty":"OD"}[s]||"—"}
+async function renderAttendance() {
+  const dt = attendanceDate();
+  const month = $("attMonth").value;
+
+  try {
+    // Load employees from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    // Load attendance from PostgreSQL
+    const response = await fetch(
+      "/api/attendance?month=" + encodeURIComponent(month)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load attendance");
+    }
+
+    const records = await response.json();
+
+    // Convert database records to frontend format
+    attendance = {};
+
+    records.forEach(record => {
+      attendance[record.date + "_" + record.employee_id] =
+        record.status;
+    });
+
+    const z = new Date(dt + "T00:00:00");
+
+    $("selectedDate").innerHTML =
+      "<b>Selected Date:</b> " +
+      z.toLocaleDateString("en-IN", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }) +
+      "<br><b>Actual Date:</b> " +
+      dt;
+
+    $("attTable").innerHTML = table(
+      ["ID", "Employee", "Date", "Status", "Edit", "Delete"],
+      employees.map(e => {
+        let s = attendance[dt + "_" + e.id];
+
+        return [
+          e.id,
+          e.name,
+          dt,
+          s ? code(s) + " - " + s : "Not Marked",
+          '<button data-a="' + e.id + '">Edit</button>',
+          '<button class="red" data-r="' + e.id + '">Delete</button>'
+        ];
+      })
+    );
+
+    $("attTable")
+      .querySelectorAll("[data-a]")
+      .forEach(b => {
+        b.onclick = () =>
+          attendanceForm(b.dataset.a, dt);
+      });
+
+    $("attTable")
+      .querySelectorAll("[data-r]")
+      .forEach(b => {
+        b.onclick = async () => {
+          if (!confirm("Delete attendance?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/attendance/" +
+                encodeURIComponent(b.dataset.r),
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(
+                data.message || "Delete failed"
+              );
+            }
+
+            await renderAttendance();
+
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error("Attendance error:", error);
+
+    $("attTable").innerHTML =
+      "<p>Unable to load attendance from server.</p>";
+  }
+}
+
+async function attendanceForm(id, dt) {
+  let cur = attendance[dt + "_" + id] || "";
+
+  let opts = [
+    "",
+    "Present",
+    "Absent",
+    "Paid Leave",
+    "Weekly Off",
+    "Half Day",
+    "On Duty"
+  ];
+
+  modal(
+    '<h2>Edit Attendance</h2>' +
+    '<p>Date: <b>' + dt + '</b></p>' +
+    '<form id="attendanceForm">' +
+    '<select name="status">' +
+    opts.map(x =>
+      '<option value="' + x + '" ' +
+      (x === cur ? "selected" : "") +
+      '>' +
+      (x || "Not Marked") +
+      '</option>'
+    ).join("") +
+    '</select>' +
+    '<button>Save</button>' +
+    '</form>'
+  );
+
+  $("attendanceForm").onsubmit = async function(ev) {
+    ev.preventDefault();
+
+    let s = new FormData(this).get("status");
+
+    try {
+      // If status is empty, delete attendance
+      if (!s) {
+        const response = await fetch(
+          "/api/attendance/" + encodeURIComponent(id),
+          {
+            method: "DELETE"
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Unable to delete attendance"
+          );
+        }
+      } else {
+        // Save attendance to PostgreSQL
+        const response = await fetch("/api/attendance", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            employee_id: id,
+            date: dt,
+            status: s
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Unable to save attendance"
+          );
+        }
+      }
+
+      closeModal();
+
+      await renderAttendance();
+      await renderPayroll();
+
+    } catch (error) {
+      console.error("Attendance save error:", error);
+      alert(error.message);
+    }
+  };
+}
+function initPayroll(){$("payMonth").innerHTML=months().map(x=>'<option value="'+x[0]+'">'+x[1]+"</option>").join("");renderPayroll()}
+function stats(id,m){let n=monthDays(m),p=0,a=0;for(let d=1;d<=n;d++){let k=m+"-"+String(d).padStart(2,"0")+"_"+id;if(attendance[k]==="Present")p++;if(attendance[k]==="Absent")a++}return{n,p,a}}
+async function salary(e, m) {
+  const response = await fetch(
+    "/api/payroll?month=" + encodeURIComponent(m)
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load salary data");
+  }
+
+  const data = await response.json();
+
+  const x = data.find(item => item.id === e.id);
+
+  if (!x) {
+    throw new Error("Payroll data not found");
+  }
+
+  return {
+    s: {
+      n: x.days,
+      p: x.present,
+      a: x.absent
+    },
+    r: {
+      allowance: Number(x.allowance) || 0,
+      deduction: Number(x.deduction) || 0,
+      status: x.status || "Pending"
+    },
+    basic: Number(x.basic) || 0,
+    net: Number(x.net) || 0
+  };
+}
+async function renderPayroll() {
+  const m = $("payMonth").value;
+
+  if (!m) return;
+
+  try {
+    // Load employees from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    // Load payroll from PostgreSQL
+    const response = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(m)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load payroll");
+    }
+
+    const data = await response.json();
+
+    $("payTable").innerHTML = table(
+      [
+        "ID",
+        "Employee",
+        "Days",
+        "Present",
+        "Absent",
+        "Monthly",
+        "Basic Payable",
+        "Allowance",
+        "Deduction",
+        "Net",
+        "Edit"
+      ],
+      data.map(x => [
+        x.id,
+        x.name,
+        x.days,
+        x.present,
+        x.absent,
+        money(x.salary),
+        money(x.basic),
+        money(x.allowance),
+        money(x.deduction),
+        money(x.net),
+        '<button data-p="' +
+          x.id +
+          '">Edit</button>'
+      ])
+    );
+
+    $("payTable")
+      .querySelectorAll("[data-p]")
+      .forEach(b => {
+        b.onclick = () =>
+          payForm(b.dataset.p, m);
+      });
+
+  } catch (error) {
+    console.error("Payroll error:", error);
+
+    $("payTable").innerHTML =
+      "<p>Unable to load payroll from server.</p>";
+  }
+}
+async function payForm(id, m) {
+  try {
+    // Load employee from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    const e = employees.find(x => x.id === id);
+
+    if (!e) {
+      throw new Error("Employee not found");
+    }
+
+    // Load current payroll data
+    const response = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(m)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load payroll");
+    }
+
+    const data = await response.json();
+
+    const current =
+      data.find(x => x.id === id) || {
+        allowance: 0,
+        deduction: 0,
+        status: "Pending"
+      };
+
+    modal(
+      '<h2>Payroll - ' + e.name + '</h2>' +
+      '<p>Present: <b>' +
+      current.present +
+      '</b> / ' +
+      current.days +
+      '<br>Basic Payable: <b>' +
+      money(current.basic) +
+      '</b></p>' +
+
+      '<form id="payForm">' +
+
+      '<label>Allowance</label>' +
+      '<input name="allowance" type="number" value="' +
+      (current.allowance || 0) +
+      '" placeholder="Allowance">' +
+
+      '<label>Deduction</label>' +
+      '<input name="deduction" type="number" value="' +
+      (current.deduction || 0) +
+      '" placeholder="Deduction">' +
+
+      '<label>Status</label>' +
+      '<select name="status">' +
+      '<option ' +
+      (current.status === "Pending" ? "selected" : "") +
+      '>Pending</option>' +
+      '<option ' +
+      (current.status === "Paid" ? "selected" : "") +
+      '>Paid</option>' +
+      '</select>' +
+
+      '<button>Save</button>' +
+
+      '</form>'
+    );
+
+    $("payForm").onsubmit = async function(ev) {
+      ev.preventDefault();
+
+      const f = new FormData(this);
+
+      const payrollData = {
+        employee_id: id,
+        month: m,
+        allowance: Number(f.get("allowance")) || 0,
+        deduction: Number(f.get("deduction")) || 0,
+        status: f.get("status")
+      };
+
+     try {
+
+  const saveResponse = await fetch(
+    "/api/payroll/" + encodeURIComponent(id),
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        month: m,
+        allowance: Number(f.get("allowance")) || 0,
+        deduction: Number(f.get("deduction")) || 0,
+        status: f.get("status")
+      })
+    }
+  );
+
+        const saveData = await saveResponse.json();
+
+        if (!saveResponse.ok) {
+          throw new Error(
+            saveData.message || "Unable to save payroll"
+          );
+        }
+
+        closeModal();
+
+        await renderPayroll();
+
+      } catch (error) {
+        console.error("Payroll save error:", error);
+        alert(error.message);
+      }
+    };
+
+  } catch (error) {
+    console.error("Payroll form error:", error);
+    alert(error.message);
+  }
+}
+function initSlip(){$("slipEmp").innerHTML=employees.map(e=>'<option value="'+e.id+'">'+e.name+"</option>").join("");$("slipMonth").innerHTML=months().map(x=>'<option value="'+x[0]+'">'+x[1]+"</option>").join("");renderSlip()}
+async function renderSlip() {
+  let id = $("slipEmp").value;
+
+  if (!id) return;
+
+  try {
+    // Employee PostgreSQL se load karo
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    const employeesData = await employeeResponse.json();
+
+    const e = employeesData.find(x => x.id === id);
+
+    if (!e) {
+      throw new Error("Employee not found");
+    }
+
+    // Payroll + attendance PostgreSQL se load karo
+    const month = $("slipMonth").value;
+
+    const payrollResponse = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(month)
+    );
+
+    if (!payrollResponse.ok) {
+      throw new Error("Failed to load payroll data");
+    }
+
+    const payrollData = await payrollResponse.json();
+
+    const x = payrollData.find(item => item.id === id);
+
+    if (!x) {
+      throw new Error("Payroll data not found");
+    }
+
+    $("slipView").innerHTML =
+      '<div class="box">' +
+
+      '<h2 style="text-align:center;color:#17427e">' +
+      'EMPLOYEE SALARY SLIP' +
+      '</h2>' +
+
+      '<p style="text-align:center">' +
+      '<b>PIET College</b><br>' +
+      'BCA 5th Semester' +
+      '</p>' +
+
+      '<p>' +
+      '<b>Employee:</b> ' + e.name +
+      '<br>' +
+
+      '<b>ID:</b> ' + e.id +
+      '<br>' +
+
+      '<b>Department:</b> ' + (e.dept || "-") +
+      '<br>' +
+
+      '<b>Month:</b> ' + month +
+      '<br>' +
+
+      '<b>Total Days:</b> ' + x.days +
+      '<br>' +
+
+      '<b>Present Days:</b> ' + x.present +
+      '<br>' +
+
+      '<b>Absent Days:</b> ' + x.absent +
+
+      '</p>' +
+
+      table(
+        ["Component", "Amount"],
+        [
+          ["Monthly Salary", money(e.salary)],
+          ["Basic Payable", money(x.basic)],
+          ["Allowance", money(x.allowance)],
+          ["Deduction", money(x.deduction)],
+          ["NET SALARY", money(x.net)]
+        ]
+      ) +
+
+      '<p>' +
+      'Formula: ROUND(Monthly Salary ÷ Total Days × Present Days) ' +
+      '+ Allowance − Deduction.' +
+      '</p>' +
+
+      '</div>';
+
+  } catch (error) {
+    console.error("Salary slip error:", error);
+
+    $("slipView").innerHTML =
+      '<div class="box">' +
+      '<p>Unable to load salary slip.</p>' +
+      '<p>' + error.message + '</p>' +
+      '</div>';
+  }
+}
+async function renderLeaves() {
+  try {
+    // Load employees from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    // Load leaves from PostgreSQL
+    const response = await fetch("/api/leaves");
+
+    if (!response.ok) {
+      throw new Error("Failed to load leaves");
+    }
+
+    const data = await response.json();
+
+    // Keep frontend format compatible
+    leaves = data.map(l => ({
+      id: l.id,
+      emp: l.employee_id,
+      from: l.from_date,
+      to: l.to_date,
+      reason: l.reason,
+      status: l.status
+    }));
+
+    const rows = leaves.map(l => [
+      employees.find(e => e.id === l.emp)?.name || l.emp,
+      l.from,
+      l.to,
+      l.reason,
+      l.status,
+      '<button data-le="' + l.id + '">Edit</button>' +
+      '<button class="red" data-ld="' + l.id + '">Delete</button>'
+    ]);
+
+    $("leaveTable").innerHTML = table(
+      ["Employee", "From", "To", "Reason", "Status", "Actions"],
+      rows
+    );
+
+    // Edit
+    $("leaveTable")
+      .querySelectorAll("[data-le]")
+      .forEach(b => {
+        b.onclick = () => leaveForm(Number(b.dataset.le));
+      });
+
+    // Delete
+    $("leaveTable")
+      .querySelectorAll("[data-ld]")
+      .forEach(b => {
+        b.onclick = async () => {
+          if (!confirm("Delete leave application?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/leaves/" + Number(b.dataset.ld),
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(
+                data.message || "Delete failed"
+              );
+            }
+
+            await renderLeaves();
+            await dashboard();
+
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error("Leave error:", error);
+
+    $("leaveTable").innerHTML =
+      "<p>Unable to load leaves from server.</p>";
+  }
+}
+async function leaveForm(id) {
+  let leave = null;
+
+  if (id !== null && id !== undefined && id >= 0) {
+    try {
+      const response = await fetch("/api/leaves");
+
+      if (!response.ok) {
+        throw new Error("Failed to load leave");
+      }
+
+      const data = await response.json();
+
+      leave = data.find(
+        l => Number(l.id) === Number(id)
+      );
+
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+  }
+
+  const l = leave || {
+    id: null,
+    employee_id: employees[0]?.id || "",
+    from_date: "",
+    to_date: "",
+    reason: "",
+    status: "Pending"
+  };
+
+  modal(
+    '<h2>' +
+      (leave ? "Edit Leave" : "Apply Leave") +
+      '</h2>' +
+
+    '<form id="leaveForm">' +
+
+    '<label>Employee</label>' +
+    '<select name="employee_id" required>' +
+    employees.map(e =>
+      '<option value="' + e.id + '" ' +
+      (e.id === l.employee_id ? "selected" : "") +
+      '>' +
+      e.name +
+      '</option>'
+    ).join("") +
+    '</select>' +
+
+    '<label>From Date</label>' +
+    '<input type="date" name="from_date" value="' +
+      (l.from_date || "") +
+      '" required>' +
+
+    '<label>To Date</label>' +
+    '<input type="date" name="to_date" value="' +
+      (l.to_date || "") +
+      '" required>' +
+
+    '<label>Reason</label>' +
+    '<input name="reason" value="' +
+      (l.reason || "") +
+      '" placeholder="Reason" required>' +
+
+    '<label>Status</label>' +
+    '<select name="status">' +
+      ["Pending", "Approved", "Rejected"]
+        .map(x =>
+          '<option ' +
+          (x === l.status ? "selected" : "") +
+          '>' +
+          x +
+          '</option>'
+        ).join("") +
+    '</select>' +
+
+    '<button>Save</button>' +
+
+    '</form>'
+  );
+
+  $("leaveForm").onsubmit = async function(ev) {
+    ev.preventDefault();
+
+    const f = new FormData(this);
+
+    const leaveData = {
+      employee_id: f.get("employee_id"),
+      from_date: f.get("from_date"),
+      to_date: f.get("to_date"),
+      reason: f.get("reason"),
+      status: f.get("status")
+    };
+
+    try {
+      const response = await fetch(
+        leave
+          ? "/api/leaves/" + leave.id
+          : "/api/leaves",
+        {
+          method: leave ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(leaveData)
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to save leave"
+        );
+      }
+
+      closeModal();
+
+      await renderLeaves();
+      await dashboard();
+
+    } catch (error) {
+      console.error("Leave save error:", error);
+      alert(error.message);
+    }
+  };
+}
+function download(name,text){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"}));a.download=name;a.click()}
+$("openLogin").onclick = function () {
+  $("welcomeScreen").style.display = "none";
+  $("loginScreen").style.display = "flex";
+};
+
+$("openSignup").onclick = function () {
+  $("welcomeScreen").style.display = "none";
+  $("signupScreen").style.display = "flex";
+};
+
+$("backToWelcome").onclick = function () {
+  $("signupScreen").style.display = "none";
+  $("welcomeScreen").style.display = "flex";
+};
+$("signupBtn").onclick = async function () {
+  const fullName = $("signupName").value.trim();
+  const username = $("signupUser").value.trim();
+  const email = $("signupEmail").value.trim();
+  const password = $("signupPass").value;
+  const confirmPassword = $("signupConfirmPass").value;
+
+  $("signupMsg").textContent = "";
+
+  if (!fullName || !username || !email || !password || !confirmPassword) {
+    $("signupMsg").textContent = "Please fill all fields.";
+    $("signupMsg").style.color = "red";
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    $("signupMsg").textContent = "Passwords do not match.";
+    $("signupMsg").style.color = "red";
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fullName,
+        username,
+        email,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      $("signupMsg").textContent = data.message || "Signup failed.";
+      $("signupMsg").style.color = "red";
+      return;
+    }
+
+    $("signupMsg").textContent = "Account created successfully!";
+    $("signupMsg").style.color = "green";
+
+    setTimeout(function () {
+      $("signupScreen").style.display = "none";
+      $("loginScreen").style.display = "flex";
+    }, 1000);
+
+  } catch (error) {
+    $("signupMsg").textContent = "Server connection failed.";
+    $("signupMsg").style.color = "red";
+  }
+};
+$("loginBtn").onclick = async function () {
+  const username = $("loginUser").value.trim();
+  const password = $("loginPass").value;
+
+  $("loginMsg").textContent = "";
+
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.ok) {
+      $("loginScreen").style.display = "none";
+      $("app").style.display = "block";
+      $("loggedUser").textContent =
+  data.fullName || data.username || "User";
+      go("dashboard", false);
+    } else {
+      $("loginMsg").textContent =
+        data.message || "Invalid username or password";
+    }
+  } catch (error) {
+    console.error(error);
+    $("loginMsg").textContent =
+      "Unable to connect to server";
+  }
+};
+$("logoutBtn").onclick=function(){$("app").style.display="none";$("loginScreen").style.display="flex"}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>go(b.dataset.page))
+$("backBtn").onclick=function(){if(history.length>1){history.pop();go(history[history.length-1],false)}}
+$("addEmp").onclick=()=>employeeForm();$("empSearch").oninput=renderEmployees;$("addDept").onclick=()=>deptForm(null)
+$("attMonth").onchange=updateAttendanceDays;$("attDay").onchange=renderAttendance;$("allPresent").onclick = async function () {
+  const dt = attendanceDate();
+
+  if (!employees.length) {
+    alert("No employees found");
+    return;
+  }
+
+  if (!confirm("Mark all employees as Present?")) {
+    return;
+  }
+
+  try {
+    for (const employee of employees) {
+      const response = await fetch("/api/attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          employee_id: employee.id,
+          date: dt,
+          status: "Present"
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to save attendance"
+        );
+      }
+    }
+
+    await renderAttendance();
+    await renderPayroll();
+
+  } catch (error) {
+    console.error("Mark all present error:", error);
+    alert(error.message);
+  }
+};
+$("resetAttendance").onclick = async function () {
+  const month = $("attMonth").value;
+
+  if (!month) {
+    alert("Please select a month");
+    return;
+  }
+
+  if (!confirm("Reset attendance for the selected month?")) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "/api/attendance/month/" + encodeURIComponent(month),
+      {
+        method: "DELETE"
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Unable to reset attendance"
+      );
+    }
+
+    alert("Attendance reset successfully.");
+
+    await renderAttendance();
+    await renderPayroll();
+
+  } catch (error) {
+    console.error("Reset attendance error:", error);
+    alert("Reset failed: " + error.message);
+  }
+};
+$("addLeave").onclick=()=>leaveForm(-1);$("payMonth").onchange=renderPayroll;$("slipEmp").onchange=renderSlip;$("slipMonth").onchange=renderSlip;$("printSlip").onclick=()=>window.print()
+$("exportEmp").onclick = async function () {
+  try {
+    const response = await fetch("/api/employees");
+
+    if (!response.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    const data = await response.json();
+
+    const csv =
+      "ID,Name,Department,Designation,Salary\n" +
+      data
+        .map(e =>
+          `${e.id},"${e.name}","${e.dept || ""}","${e.role || ""}",${e.salary || 0}`
+        )
+        .join("\n");
+
+    download("Ayush_Employees.csv", csv);
+
+  } catch (error) {
+    console.error("Employee export error:", error);
+    alert(error.message);
+  }
+};
+$("exportPay").onclick = async function () {
+  const month = $("payMonth").value;
+
+  if (!month) {
+    alert("Please select a month");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(month)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load payroll");
+    }
+
+    const data = await response.json();
+
+    const csv =
+      "ID,Name,Month,Days,Present,Absent,Net Salary\n" +
+      data
+        .map(x =>
+          `${x.id},"${x.name}",${month},${x.days},${x.present},${x.absent},${x.net}`
+        )
+        .join("\n");
+
+    download("Ayush_Payroll.csv", csv);
+
+  } catch (error) {
+    console.error("Payroll export error:", error);
+    alert(error.message);
+  }
+};
+$("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("modal").classList.contains("show"))closeModal();else $("backBtn").click()}})
+save();dashboard();
+})();
+</script></body></html>

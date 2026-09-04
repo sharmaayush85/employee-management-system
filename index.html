@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Employee Management System - Ayush Sharma</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#1f2937}
+button{padding:9px 13px;border:0;border-radius:6px;background:#17427e;color:#fff;cursor:pointer;margin:2px}button.red{background:#b42318}button.gray{background:#64748b}
+input,select{padding:10px;border:1px solid #cbd5e1;border-radius:6px;width:100%;margin:5px 0}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#17427e}.loginbox{width:360px;background:#fff;padding:30px;border-radius:12px}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:#17427e;color:#fff;padding:15px}.sidebar button{width:100%;background:transparent;text-align:left}
+.main{margin-left:220px;padding:20px}.top,.box,.card{background:#fff;border-radius:10px;padding:18px;margin-bottom:16px}.top{display:flex;justify-content:space-between}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}th{background:#eaf1ff}
+.page{display:none}.page.active{display:block}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center}.modal.show{display:flex}.modalbox{background:#fff;padding:25px;border-radius:10px;width:min(600px,94%);max-height:90vh;overflow:auto}
+@media(max-width:750px){.sidebar{position:relative;width:100%}.main{margin-left:0}.grid{grid-template-columns:1fr 1fr}}
+@media print{.sidebar,.top,.no-print{display:none!important}.main{margin:0}.box{box-shadow:none}}
+</style></head>
+<body>
+<div id="loginScreen" class="login"><div class="loginbox"><h2>Employee Management System</h2><p style="text-align:center">PIET College • BCA 5th Semester</p><input id="loginUser" placeholder="Username"><input id="loginPass" type="password" placeholder="Password"><button id="loginBtn" style="width:100%">Login</button><p id="loginMsg" style="color:#b42318"></p><small>Demo: admin / admin123</small></div></div>
+<div id="app" style="display:none">
+<aside class="sidebar"><h2>EMS</h2><p>Ayush Sharma</p><button data-page="dashboard">🏠 Dashboard</button><button data-page="employees">👥 Employees</button><button data-page="departments">🏢 Departments</button><button data-page="attendance">🕒 Attendance</button><button data-page="leave">📅 Leave</button><button data-page="payroll">💰 Payroll</button><button data-page="slip">🧾 Salary Slip</button><button data-page="reports">📊 Reports</button><button id="logoutBtn">🚪 Logout</button></aside>
+<main class="main"><div class="top no-print"><button id="backBtn" class="gray">↩ Back</button><b>Ayush Sharma | Roll No. 241433</b></div>
+<section id="dashboard" class="page active"><div class="box"><h2>Employee Management System</h2><p><b>Name:</b> Ayush Sharma &nbsp; <b>Roll No:</b> 241433 &nbsp; <b>University Roll No:</b> 00240405040116</p><p><b>PIET College</b> — BCA 5th Semester</p></div><div class="grid"><div class="card"><b>Total Employees</b><h2 id="totalEmp">0</h2></div><div class="card"><b>Departments</b><h2 id="totalDept">0</h2></div><div class="card"><b>Present Today</b><h2 id="presentToday">0</h2></div><div class="card"><b>Pending Leaves</b><h2 id="pendingLeave">0</h2></div></div></section>
+<section id="employees" class="page"><div class="box"><button id="addEmp">+ Add Employee</button><input id="empSearch" placeholder="Search employee"><div id="empTable"></div></div></section>
+<section id="departments" class="page"><div class="box"><button id="addDept">+ Add Department</button><div id="deptTable"></div></div></section>
+<section id="attendance" class="page"><div class="box"><h2>Attendance Management</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Month</label><select id="attMonth"></select></div><div><label>Day</label><select id="attDay"></select></div></div><div id="selectedDate" class="box"></div><button id="allPresent">Mark All PR</button><button id="resetAttendance" class="red">Reset Month</button><div id="attTable"></div></div></section>
+<section id="leave" class="page"><div class="box"><button id="addLeave">+ Apply Leave</button><div id="leaveTable"></div></div></section>
+<section id="payroll" class="page"><div class="box"><h2>Month-wise Payroll</h2><select id="payMonth"></select><div id="payTable"></div></div></section>
+<section id="slip" class="page"><div class="box no-print"><select id="slipEmp"></select><select id="slipMonth"></select><button id="printSlip">🖨 Print Salary Slip</button></div><div id="slipView"></div></section>
+<section id="reports" class="page"><div class="box"><button id="exportEmp">Export Employees CSV</button><button id="exportPay">Export Payroll CSV</button></div></section>
+</main></div>
+<div id="modal" class="modal"><div id="modalBox" class="modalbox"></div></div>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+let employees=JSON.parse(localStorage.getItem("emsE")||"[]");
+let departments=JSON.parse(localStorage.getItem("emsD")||'["HR","IT","Finance","Sales","Marketing"]');
+let attendance=JSON.parse(localStorage.getItem("emsA")||"{}");
+let leaves=JSON.parse(localStorage.getItem("emsL")||"[]");
+let payroll=JSON.parse(localStorage.getItem("emsP")||"{}");
+let history=["dashboard"];
+
+function save(){localStorage.setItem("emsE",JSON.stringify(employees));localStorage.setItem("emsD",JSON.stringify(departments));localStorage.setItem("emsA",JSON.stringify(attendance));localStorage.setItem("emsL",JSON.stringify(leaves));localStorage.setItem("emsP",JSON.stringify(payroll))}
+function money(n){return "₹"+Math.round(Number(n)||0).toLocaleString("en-IN")}
+function months(){let a=[],d=new Date();for(let i=0;i<12;i++){let x=new Date(d.getFullYear(),d.getMonth()-i,1),v=x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0");a.push([v,x.toLocaleDateString("en-IN",{month:"long",year:"numeric"})])}return a}
+function monthDays(m){let [y,mo]=m.split("-").map(Number);return new Date(y,mo,0).getDate()}
+function table(head,rows){if(!rows.length)return "<p>No records found.</p>";return "<table><thead><tr>"+head.map(h=>"<th>"+h+"</th>").join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+r.map(v=>"<td>"+v+"</td>").join("")+"</tr>").join("")+"</tbody></table>"}
+function modal(html){$("modalBox").innerHTML=html;$("modal").classList.add("show")}
+function closeModal(){$("modal").classList.remove("show")}
+function go(id,record=true){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(id).classList.add("active");if(record&&history[history.length-1]!==id)history.push(id);render(id)}
+function render(id){dashboard();if(id==="employees")renderEmployees();if(id==="departments")renderDepartments();if(id==="attendance")initAttendance();if(id==="leave")renderLeaves();if(id==="payroll")initPayroll();if(id==="slip")initSlip()}
+async function dashboard() {
+  try {
+    const response = await fetch("/api/dashboard");
+
+    if (!response.ok) {
+      throw new Error("Failed to load dashboard");
+    }
+
+    const data = await response.json();
+
+    $("totalEmp").textContent = data.employees;
+    $("totalDept").textContent = data.departments;
+    $("pendingLeave").textContent = data.pendingLeaves;
+
+  } catch (error) {
+    console.error("Dashboard error:", error);
+  }
+}
+async function renderEmployees() {
+  try {
+    const response = await fetch("/api/employees");
+
+    if (!response.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await response.json();
+
+    let q = ($("empSearch").value || "").toLowerCase();
+
+    let rows = employees
+      .filter(e =>
+        (e.id + " " + e.name + " " + e.dept + " " + e.role)
+          .toLowerCase()
+          .includes(q)
+      )
+      .map(e => [
+        e.id,
+        e.name,
+        e.dept,
+        e.role,
+        money(e.salary),
+        '<button data-edit="' + e.id + '">Edit</button>' +
+        '<button class="red" data-del="' + e.id + '">Delete</button>'
+      ]);
+
+    $("empTable").innerHTML = table(
+      ["ID", "Name", "Department", "Designation", "Monthly Salary", "Actions"],
+      rows
+    );
+
+    $("empTable")
+      .querySelectorAll("[data-edit]")
+      .forEach(b => {
+        b.onclick = () => employeeForm(b.dataset.edit);
+      });
+
+    $("empTable")
+      .querySelectorAll("[data-del]")
+      .forEach(b => {
+        b.onclick = async () => {
+          if (!confirm("Delete employee?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/employees/" + encodeURIComponent(b.dataset.del),
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Delete failed");
+            }
+
+            await renderEmployees();
+            await dashboard();
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error(error);
+    $("empTable").innerHTML =
+      "<p>Unable to load employees from server.</p>";
+  }
+}
+async function employeeForm(id) {
+  let e = employees.find(x => x.id === id) || {
+    id: "",
+    name: "",
+    dept: departments[0] || "",
+    role: "",
+    salary: 30000
+  };
+
+  modal(
+    '<h2>' + (id ? "Edit" : "Add") + ' Employee</h2>' +
+    '<form id="employeeForm">' +
+    '<input name="id" value="' + e.id + '" placeholder="Employee ID" ' +
+    (id ? "readonly" : "") + ' required>' +
+    '<input name="name" value="' + e.name + '" placeholder="Name" required>' +
+    '<select name="dept">' +
+    departments.map(d =>
+      '<option ' + (d === e.dept ? "selected" : "") + '>' +
+      d +
+      '</option>'
+    ).join("") +
+    '</select>' +
+    '<input name="role" value="' + e.role + '" placeholder="Designation" required>' +
+    '<input name="salary" type="number" value="' + e.salary +
+    '" placeholder="Monthly Salary" required>' +
+    '<button>Save</button>' +
+    '</form>'
+  );
+
+  $("employeeForm").onsubmit = async function (ev) {
+    ev.preventDefault();
+
+    const f = new FormData(this);
+
+    const employee = {
+      id: f.get("id"),
+      name: f.get("name"),
+      dept: f.get("dept"),
+      role: f.get("role"),
+      salary: Number(f.get("salary")) || 0
+    };
+
+    try {
+      const response = await fetch(
+        id
+          ? "/api/employees/" + encodeURIComponent(id)
+          : "/api/employees",
+        {
+          method: id ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(employee)
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to save employee");
+      }
+
+      closeModal();
+
+      await renderEmployees();
+      await dashboard();
+
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+}
+async function renderDepartments() {
+  try {
+    const response = await fetch("/api/departments");
+
+    if (!response.ok) {
+      throw new Error("Failed to load departments");
+    }
+
+    const data = await response.json();
+
+    // Database se sirf department names frontend array mein rakhenge
+    departments = data.map(d => d.name);
+
+    const rows = data.map(d => [
+      d.name,
+      employees.filter(e => e.dept === d.name).length,
+      '<button data-e="' + d.id + '">Edit</button>' +
+      '<button class="red" data-d="' + d.id + '">Delete</button>'
+    ]);
+
+    $("deptTable").innerHTML = table(
+      ["Department", "Employees", "Actions"],
+      rows
+    );
+
+    $("deptTable")
+      .querySelectorAll("[data-e]")
+      .forEach(b => {
+        b.onclick = () => deptForm(Number(b.dataset.e));
+      });
+
+    $("deptTable")
+      .querySelectorAll("[data-d]")
+      .forEach(b => {
+        b.onclick = async () => {
+          const id = Number(b.dataset.d);
+
+          if (!confirm("Delete department?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/departments/" + id,
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Delete failed");
+            }
+
+            await renderDepartments();
+            await renderEmployees();
+            await dashboard();
+
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error(error);
+
+    $("deptTable").innerHTML =
+      "<p>Unable to load departments from server.</p>";
+  }
+}
+async function deptForm(id) {
+  let old = "";
+
+  if (id) {
+    try {
+      const response = await fetch("/api/departments");
+
+      if (!response.ok) {
+        throw new Error("Failed to load department");
+      }
+
+      const data = await response.json();
+      const department = data.find(d => Number(d.id) === Number(id));
+
+      if (department) {
+        old = department.name;
+      }
+
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+  }
+
+  modal(
+    '<h2>' + (id ? "Edit Department" : "Add Department") + '</h2>' +
+    '<form id="deptForm">' +
+    '<input name="name" value="' + old + '" ' +
+    'placeholder="Department Name" required>' +
+    '<button>Save</button>' +
+    '</form>'
+  );
+
+  $("deptForm").onsubmit = async function (ev) {
+    ev.preventDefault();
+
+    const name = new FormData(this)
+      .get("name")
+      .trim();
+
+    if (!name) {
+      alert("Department name is required");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        id
+          ? "/api/departments/" + id
+          : "/api/departments",
+        {
+          method: id ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to save department"
+        );
+      }
+
+      closeModal();
+
+      await renderDepartments();
+      await renderEmployees();
+      await dashboard();
+
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+}
+function initAttendance(){$("attMonth").innerHTML=months().map(x=>'<option value="'+x[0]+'">'+x[1]+"</option>").join("");updateAttendanceDays()}
+function updateAttendanceDays(){let m=$("attMonth").value,n=monthDays(m),old=+$("attDay").value||1;$("attDay").innerHTML=Array.from({length:n},(_,i)=>"<option value='"+(i+1)+"'>"+(i+1)+"</option>").join("");$("attDay").value=old<=n?old:1;renderAttendance()}
+function attendanceDate(){return $("attMonth").value+"-"+String($("attDay").value).padStart(2,"0")}
+function code(s){return {Present:"PR",Absent:"AB","Paid Leave":"PL","Weekly Off":"WO","Half Day":"HD","On Duty":"OD"}[s]||"—"}
+async function renderAttendance() {
+  const dt = attendanceDate();
+  const month = $("attMonth").value;
+
+  try {
+    // Load employees from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    // Load attendance from PostgreSQL
+    const response = await fetch(
+      "/api/attendance?month=" + encodeURIComponent(month)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load attendance");
+    }
+
+    const records = await response.json();
+
+    // Convert database records to frontend format
+    attendance = {};
+
+    records.forEach(record => {
+      attendance[record.date + "_" + record.employee_id] =
+        record.status;
+    });
+
+    const z = new Date(dt + "T00:00:00");
+
+    $("selectedDate").innerHTML =
+      "<b>Selected Date:</b> " +
+      z.toLocaleDateString("en-IN", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }) +
+      "<br><b>Actual Date:</b> " +
+      dt;
+
+    $("attTable").innerHTML = table(
+      ["ID", "Employee", "Date", "Status", "Edit", "Delete"],
+      employees.map(e => {
+        let s = attendance[dt + "_" + e.id];
+
+        return [
+          e.id,
+          e.name,
+          dt,
+          s ? code(s) + " - " + s : "Not Marked",
+          '<button data-a="' + e.id + '">Edit</button>',
+          '<button class="red" data-r="' + e.id + '">Delete</button>'
+        ];
+      })
+    );
+
+    $("attTable")
+      .querySelectorAll("[data-a]")
+      .forEach(b => {
+        b.onclick = () =>
+          attendanceForm(b.dataset.a, dt);
+      });
+
+    $("attTable")
+      .querySelectorAll("[data-r]")
+      .forEach(b => {
+        b.onclick = async () => {
+          if (!confirm("Delete attendance?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/attendance/" +
+                encodeURIComponent(b.dataset.r),
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(
+                data.message || "Delete failed"
+              );
+            }
+
+            await renderAttendance();
+
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error("Attendance error:", error);
+
+    $("attTable").innerHTML =
+      "<p>Unable to load attendance from server.</p>";
+  }
+}
+
+async function attendanceForm(id, dt) {
+  let cur = attendance[dt + "_" + id] || "";
+
+  let opts = [
+    "",
+    "Present",
+    "Absent",
+    "Paid Leave",
+    "Weekly Off",
+    "Half Day",
+    "On Duty"
+  ];
+
+  modal(
+    '<h2>Edit Attendance</h2>' +
+    '<p>Date: <b>' + dt + '</b></p>' +
+    '<form id="attendanceForm">' +
+    '<select name="status">' +
+    opts.map(x =>
+      '<option value="' + x + '" ' +
+      (x === cur ? "selected" : "") +
+      '>' +
+      (x || "Not Marked") +
+      '</option>'
+    ).join("") +
+    '</select>' +
+    '<button>Save</button>' +
+    '</form>'
+  );
+
+  $("attendanceForm").onsubmit = async function(ev) {
+    ev.preventDefault();
+
+    let s = new FormData(this).get("status");
+
+    try {
+      // If status is empty, delete attendance
+      if (!s) {
+        const response = await fetch(
+          "/api/attendance/" + encodeURIComponent(id),
+          {
+            method: "DELETE"
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Unable to delete attendance"
+          );
+        }
+      } else {
+        // Save attendance to PostgreSQL
+        const response = await fetch("/api/attendance", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            employee_id: id,
+            date: dt,
+            status: s
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Unable to save attendance"
+          );
+        }
+      }
+
+      closeModal();
+
+      await renderAttendance();
+      await renderPayroll();
+
+    } catch (error) {
+      console.error("Attendance save error:", error);
+      alert(error.message);
+    }
+  };
+}
+function initPayroll(){$("payMonth").innerHTML=months().map(x=>'<option value="'+x[0]+'">'+x[1]+"</option>").join("");renderPayroll()}
+function stats(id,m){let n=monthDays(m),p=0,a=0;for(let d=1;d<=n;d++){let k=m+"-"+String(d).padStart(2,"0")+"_"+id;if(attendance[k]==="Present")p++;if(attendance[k]==="Absent")a++}return{n,p,a}}
+async function salary(e, m) {
+  const response = await fetch(
+    "/api/payroll?month=" + encodeURIComponent(m)
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load salary data");
+  }
+
+  const data = await response.json();
+
+  const x = data.find(item => item.id === e.id);
+
+  if (!x) {
+    throw new Error("Payroll data not found");
+  }
+
+  return {
+    s: {
+      n: x.days,
+      p: x.present,
+      a: x.absent
+    },
+    r: {
+      allowance: Number(x.allowance) || 0,
+      deduction: Number(x.deduction) || 0,
+      status: x.status || "Pending"
+    },
+    basic: Number(x.basic) || 0,
+    net: Number(x.net) || 0
+  };
+}
+async function renderPayroll() {
+  const m = $("payMonth").value;
+
+  if (!m) return;
+
+  try {
+    // Load employees from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    // Load payroll from PostgreSQL
+    const response = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(m)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load payroll");
+    }
+
+    const data = await response.json();
+
+    $("payTable").innerHTML = table(
+      [
+        "ID",
+        "Employee",
+        "Days",
+        "Present",
+        "Absent",
+        "Monthly",
+        "Basic Payable",
+        "Allowance",
+        "Deduction",
+        "Net",
+        "Edit"
+      ],
+      data.map(x => [
+        x.id,
+        x.name,
+        x.days,
+        x.present,
+        x.absent,
+        money(x.salary),
+        money(x.basic),
+        money(x.allowance),
+        money(x.deduction),
+        money(x.net),
+        '<button data-p="' +
+          x.id +
+          '">Edit</button>'
+      ])
+    );
+
+    $("payTable")
+      .querySelectorAll("[data-p]")
+      .forEach(b => {
+        b.onclick = () =>
+          payForm(b.dataset.p, m);
+      });
+
+  } catch (error) {
+    console.error("Payroll error:", error);
+
+    $("payTable").innerHTML =
+      "<p>Unable to load payroll from server.</p>";
+  }
+}
+async function payForm(id, m) {
+  try {
+    // Load employee from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    const e = employees.find(x => x.id === id);
+
+    if (!e) {
+      throw new Error("Employee not found");
+    }
+
+    // Load current payroll data
+    const response = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(m)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load payroll");
+    }
+
+    const data = await response.json();
+
+    const current =
+      data.find(x => x.id === id) || {
+        allowance: 0,
+        deduction: 0,
+        status: "Pending"
+      };
+
+    modal(
+      '<h2>Payroll - ' + e.name + '</h2>' +
+      '<p>Present: <b>' +
+      current.present +
+      '</b> / ' +
+      current.days +
+      '<br>Basic Payable: <b>' +
+      money(current.basic) +
+      '</b></p>' +
+
+      '<form id="payForm">' +
+
+      '<label>Allowance</label>' +
+      '<input name="allowance" type="number" value="' +
+      (current.allowance || 0) +
+      '" placeholder="Allowance">' +
+
+      '<label>Deduction</label>' +
+      '<input name="deduction" type="number" value="' +
+      (current.deduction || 0) +
+      '" placeholder="Deduction">' +
+
+      '<label>Status</label>' +
+      '<select name="status">' +
+      '<option ' +
+      (current.status === "Pending" ? "selected" : "") +
+      '>Pending</option>' +
+      '<option ' +
+      (current.status === "Paid" ? "selected" : "") +
+      '>Paid</option>' +
+      '</select>' +
+
+      '<button>Save</button>' +
+
+      '</form>'
+    );
+
+    $("payForm").onsubmit = async function(ev) {
+      ev.preventDefault();
+
+      const f = new FormData(this);
+
+      const payrollData = {
+        employee_id: id,
+        month: m,
+        allowance: Number(f.get("allowance")) || 0,
+        deduction: Number(f.get("deduction")) || 0,
+        status: f.get("status")
+      };
+
+     try {
+
+  const saveResponse = await fetch(
+    "/api/payroll/" + encodeURIComponent(id),
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        month: m,
+        allowance: Number(f.get("allowance")) || 0,
+        deduction: Number(f.get("deduction")) || 0,
+        status: f.get("status")
+      })
+    }
+  );
+
+        const saveData = await saveResponse.json();
+
+        if (!saveResponse.ok) {
+          throw new Error(
+            saveData.message || "Unable to save payroll"
+          );
+        }
+
+        closeModal();
+
+        await renderPayroll();
+
+      } catch (error) {
+        console.error("Payroll save error:", error);
+        alert(error.message);
+      }
+    };
+
+  } catch (error) {
+    console.error("Payroll form error:", error);
+    alert(error.message);
+  }
+}
+function initSlip(){$("slipEmp").innerHTML=employees.map(e=>'<option value="'+e.id+'">'+e.name+"</option>").join("");$("slipMonth").innerHTML=months().map(x=>'<option value="'+x[0]+'">'+x[1]+"</option>").join("");renderSlip()}
+async function renderSlip() {
+  let id = $("slipEmp").value;
+
+  if (!id) return;
+
+  try {
+    // Employee PostgreSQL se load karo
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    const employeesData = await employeeResponse.json();
+
+    const e = employeesData.find(x => x.id === id);
+
+    if (!e) {
+      throw new Error("Employee not found");
+    }
+
+    // Payroll + attendance PostgreSQL se load karo
+    const month = $("slipMonth").value;
+
+    const payrollResponse = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(month)
+    );
+
+    if (!payrollResponse.ok) {
+      throw new Error("Failed to load payroll data");
+    }
+
+    const payrollData = await payrollResponse.json();
+
+    const x = payrollData.find(item => item.id === id);
+
+    if (!x) {
+      throw new Error("Payroll data not found");
+    }
+
+    $("slipView").innerHTML =
+      '<div class="box">' +
+
+      '<h2 style="text-align:center;color:#17427e">' +
+      'EMPLOYEE SALARY SLIP' +
+      '</h2>' +
+
+      '<p style="text-align:center">' +
+      '<b>PIET College</b><br>' +
+      'BCA 5th Semester' +
+      '</p>' +
+
+      '<p>' +
+      '<b>Employee:</b> ' + e.name +
+      '<br>' +
+
+      '<b>ID:</b> ' + e.id +
+      '<br>' +
+
+      '<b>Department:</b> ' + (e.dept || "-") +
+      '<br>' +
+
+      '<b>Month:</b> ' + month +
+      '<br>' +
+
+      '<b>Total Days:</b> ' + x.days +
+      '<br>' +
+
+      '<b>Present Days:</b> ' + x.present +
+      '<br>' +
+
+      '<b>Absent Days:</b> ' + x.absent +
+
+      '</p>' +
+
+      table(
+        ["Component", "Amount"],
+        [
+          ["Monthly Salary", money(e.salary)],
+          ["Basic Payable", money(x.basic)],
+          ["Allowance", money(x.allowance)],
+          ["Deduction", money(x.deduction)],
+          ["NET SALARY", money(x.net)]
+        ]
+      ) +
+
+      '<p>' +
+      'Formula: ROUND(Monthly Salary ÷ Total Days × Present Days) ' +
+      '+ Allowance − Deduction.' +
+      '</p>' +
+
+      '</div>';
+
+  } catch (error) {
+    console.error("Salary slip error:", error);
+
+    $("slipView").innerHTML =
+      '<div class="box">' +
+      '<p>Unable to load salary slip.</p>' +
+      '<p>' + error.message + '</p>' +
+      '</div>';
+  }
+}
+async function renderLeaves() {
+  try {
+    // Load employees from PostgreSQL
+    const employeeResponse = await fetch("/api/employees");
+
+    if (!employeeResponse.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    employees = await employeeResponse.json();
+
+    // Load leaves from PostgreSQL
+    const response = await fetch("/api/leaves");
+
+    if (!response.ok) {
+      throw new Error("Failed to load leaves");
+    }
+
+    const data = await response.json();
+
+    // Keep frontend format compatible
+    leaves = data.map(l => ({
+      id: l.id,
+      emp: l.employee_id,
+      from: l.from_date,
+      to: l.to_date,
+      reason: l.reason,
+      status: l.status
+    }));
+
+    const rows = leaves.map(l => [
+      employees.find(e => e.id === l.emp)?.name || l.emp,
+      l.from,
+      l.to,
+      l.reason,
+      l.status,
+      '<button data-le="' + l.id + '">Edit</button>' +
+      '<button class="red" data-ld="' + l.id + '">Delete</button>'
+    ]);
+
+    $("leaveTable").innerHTML = table(
+      ["Employee", "From", "To", "Reason", "Status", "Actions"],
+      rows
+    );
+
+    // Edit
+    $("leaveTable")
+      .querySelectorAll("[data-le]")
+      .forEach(b => {
+        b.onclick = () => leaveForm(Number(b.dataset.le));
+      });
+
+    // Delete
+    $("leaveTable")
+      .querySelectorAll("[data-ld]")
+      .forEach(b => {
+        b.onclick = async () => {
+          if (!confirm("Delete leave application?")) return;
+
+          try {
+            const response = await fetch(
+              "/api/leaves/" + Number(b.dataset.ld),
+              {
+                method: "DELETE"
+              }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(
+                data.message || "Delete failed"
+              );
+            }
+
+            await renderLeaves();
+            await dashboard();
+
+          } catch (error) {
+            alert(error.message);
+          }
+        };
+      });
+
+  } catch (error) {
+    console.error("Leave error:", error);
+
+    $("leaveTable").innerHTML =
+      "<p>Unable to load leaves from server.</p>";
+  }
+}
+async function leaveForm(id) {
+  let leave = null;
+
+  if (id !== null && id !== undefined && id >= 0) {
+    try {
+      const response = await fetch("/api/leaves");
+
+      if (!response.ok) {
+        throw new Error("Failed to load leave");
+      }
+
+      const data = await response.json();
+
+      leave = data.find(
+        l => Number(l.id) === Number(id)
+      );
+
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+  }
+
+  const l = leave || {
+    id: null,
+    employee_id: employees[0]?.id || "",
+    from_date: "",
+    to_date: "",
+    reason: "",
+    status: "Pending"
+  };
+
+  modal(
+    '<h2>' +
+      (leave ? "Edit Leave" : "Apply Leave") +
+      '</h2>' +
+
+    '<form id="leaveForm">' +
+
+    '<label>Employee</label>' +
+    '<select name="employee_id" required>' +
+    employees.map(e =>
+      '<option value="' + e.id + '" ' +
+      (e.id === l.employee_id ? "selected" : "") +
+      '>' +
+      e.name +
+      '</option>'
+    ).join("") +
+    '</select>' +
+
+    '<label>From Date</label>' +
+    '<input type="date" name="from_date" value="' +
+      (l.from_date || "") +
+      '" required>' +
+
+    '<label>To Date</label>' +
+    '<input type="date" name="to_date" value="' +
+      (l.to_date || "") +
+      '" required>' +
+
+    '<label>Reason</label>' +
+    '<input name="reason" value="' +
+      (l.reason || "") +
+      '" placeholder="Reason" required>' +
+
+    '<label>Status</label>' +
+    '<select name="status">' +
+      ["Pending", "Approved", "Rejected"]
+        .map(x =>
+          '<option ' +
+          (x === l.status ? "selected" : "") +
+          '>' +
+          x +
+          '</option>'
+        ).join("") +
+    '</select>' +
+
+    '<button>Save</button>' +
+
+    '</form>'
+  );
+
+  $("leaveForm").onsubmit = async function(ev) {
+    ev.preventDefault();
+
+    const f = new FormData(this);
+
+    const leaveData = {
+      employee_id: f.get("employee_id"),
+      from_date: f.get("from_date"),
+      to_date: f.get("to_date"),
+      reason: f.get("reason"),
+      status: f.get("status")
+    };
+
+    try {
+      const response = await fetch(
+        leave
+          ? "/api/leaves/" + leave.id
+          : "/api/leaves",
+        {
+          method: leave ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(leaveData)
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to save leave"
+        );
+      }
+
+      closeModal();
+
+      await renderLeaves();
+      await dashboard();
+
+    } catch (error) {
+      console.error("Leave save error:", error);
+      alert(error.message);
+    }
+  };
+}
+function download(name,text){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"}));a.download=name;a.click()}
+$("loginBtn").onclick = async function () {
+  const username = $("loginUser").value.trim();
+  const password = $("loginPass").value;
+
+  $("loginMsg").textContent = "";
+
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.ok) {
+      $("loginScreen").style.display = "none";
+      $("app").style.display = "block";
+      go("dashboard", false);
+    } else {
+      $("loginMsg").textContent =
+        data.message || "Invalid username or password";
+    }
+  } catch (error) {
+    console.error(error);
+    $("loginMsg").textContent =
+      "Unable to connect to server";
+  }
+};
+$("logoutBtn").onclick=function(){$("app").style.display="none";$("loginScreen").style.display="flex"}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>go(b.dataset.page))
+$("backBtn").onclick=function(){if(history.length>1){history.pop();go(history[history.length-1],false)}}
+$("addEmp").onclick=()=>employeeForm();$("empSearch").oninput=renderEmployees;$("addDept").onclick=()=>deptForm(null)
+$("attMonth").onchange=updateAttendanceDays;$("attDay").onchange=renderAttendance;$("allPresent").onclick = async function () {
+  const dt = attendanceDate();
+
+  if (!employees.length) {
+    alert("No employees found");
+    return;
+  }
+
+  if (!confirm("Mark all employees as Present?")) {
+    return;
+  }
+
+  try {
+    for (const employee of employees) {
+      const response = await fetch("/api/attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          employee_id: employee.id,
+          date: dt,
+          status: "Present"
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Unable to save attendance"
+        );
+      }
+    }
+
+    await renderAttendance();
+    await renderPayroll();
+
+  } catch (error) {
+    console.error("Mark all present error:", error);
+    alert(error.message);
+  }
+};
+$("resetAttendance").onclick = async function () {
+  const month = $("attMonth").value;
+
+  if (!month) {
+    alert("Please select a month");
+    return;
+  }
+
+  if (!confirm("Reset attendance for the selected month?")) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "/api/attendance/month/" + encodeURIComponent(month),
+      {
+        method: "DELETE"
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Unable to reset attendance"
+      );
+    }
+
+    alert("Attendance reset successfully.");
+
+    await renderAttendance();
+    await renderPayroll();
+
+  } catch (error) {
+    console.error("Reset attendance error:", error);
+    alert("Reset failed: " + error.message);
+  }
+};
+$("addLeave").onclick=()=>leaveForm(-1);$("payMonth").onchange=renderPayroll;$("slipEmp").onchange=renderSlip;$("slipMonth").onchange=renderSlip;$("printSlip").onclick=()=>window.print()
+$("exportEmp").onclick = async function () {
+  try {
+    const response = await fetch("/api/employees");
+
+    if (!response.ok) {
+      throw new Error("Failed to load employees");
+    }
+
+    const data = await response.json();
+
+    const csv =
+      "ID,Name,Department,Designation,Salary\n" +
+      data
+        .map(e =>
+          `${e.id},"${e.name}","${e.dept || ""}","${e.role || ""}",${e.salary || 0}`
+        )
+        .join("\n");
+
+    download("Ayush_Employees.csv", csv);
+
+  } catch (error) {
+    console.error("Employee export error:", error);
+    alert(error.message);
+  }
+};
+$("exportPay").onclick = async function () {
+  const month = $("payMonth").value;
+
+  if (!month) {
+    alert("Please select a month");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "/api/payroll?month=" + encodeURIComponent(month)
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load payroll");
+    }
+
+    const data = await response.json();
+
+    const csv =
+      "ID,Name,Month,Days,Present,Absent,Net Salary\n" +
+      data
+        .map(x =>
+          `${x.id},"${x.name}",${month},${x.days},${x.present},${x.absent},${x.net}`
+        )
+        .join("\n");
+
+    download("Ayush_Payroll.csv", csv);
+
+  } catch (error) {
+    console.error("Payroll export error:", error);
+    alert(error.message);
+  }
+};
+$("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("modal").classList.contains("show"))closeModal();else $("backBtn").click()}})
+save();dashboard();
+})();
+</script></body></html>
