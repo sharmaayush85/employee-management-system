@@ -543,6 +543,42 @@ app.get("/api/payroll", async (req, res) => {
         [employee.id, `${month}-%`]
       );
 
+const paidLeaveResult = await query(
+  `SELECT COUNT(*) AS count
+   FROM attendance
+   WHERE employee_id=$1
+   AND date LIKE $2
+   AND status='Paid Leave'`,
+  [employee.id, `${month}-%`]
+);
+
+const weeklyOffResult = await query(
+  `SELECT COUNT(*) AS count
+   FROM attendance
+   WHERE employee_id=$1
+   AND date LIKE $2
+   AND status='Weekly Off'`,
+  [employee.id, `${month}-%`]
+);
+
+const onDutyResult = await query(
+  `SELECT COUNT(*) AS count
+   FROM attendance
+   WHERE employee_id=$1
+   AND date LIKE $2
+   AND status='On Duty'`,
+  [employee.id, `${month}-%`]
+);
+
+const halfDayResult = await query(
+  `SELECT COUNT(*) AS count
+   FROM attendance
+   WHERE employee_id=$1
+   AND date LIKE $2
+   AND status='Half Day'`,
+  [employee.id, `${month}-%`]
+);
+
       const payrollResult = await query(
         `SELECT *
          FROM payroll
@@ -565,8 +601,31 @@ app.get("/api/payroll", async (req, res) => {
         absentResult.rows[0].count
       );
 
+      const paidLeave = Number(
+  paidLeaveResult.rows[0].count
+);
+
+const weeklyOff = Number(
+  weeklyOffResult.rows[0].count
+);
+
+const onDuty = Number(
+  onDutyResult.rows[0].count
+);
+
+const halfDay = Number(
+  halfDayResult.rows[0].count
+);
+
+const paidDays =
+  present +
+  paidLeave +
+  weeklyOff +
+  onDuty +
+  halfDay * 0.5;
+
       const basic = Math.round(
-        (Number(employee.salary) / daysInMonth) * present
+        (Number(employee.salary) / daysInMonth) * paidDays
       );
 
       const allowance = Number(payroll.allowance) || 0;
@@ -581,6 +640,11 @@ app.get("/api/payroll", async (req, res) => {
         days: daysInMonth,
         present,
         absent,
+        paidLeave,
+        weeklyOff,
+        onDuty,
+        halfDay,
+        paidDays,
         basic,
         allowance,
         deduction,

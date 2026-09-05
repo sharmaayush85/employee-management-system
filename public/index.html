@@ -2422,9 +2422,9 @@ tbody tr:hover{
       </div>
     </div>
 
-    <div class="payroll-table-wrap">
-      <div id="payTable"></div>
-    </div>
+    <div class="payroll-table-wrap" style="overflow-x:auto; width:100%;">
+    <div id="payTable"></div>
+</div>
 
   </div>
 </section>
@@ -3195,24 +3195,35 @@ async function renderPayroll() {
 
     $("payTable").innerHTML = table(
       [
-        "ID",
-        "Employee",
-        "Days",
-        "Present",
-        "Absent",
-        "Monthly",
-        "Basic Payable",
-        "Allowance",
-        "Deduction",
-        "Net",
-        "Edit"
-      ],
+  "ID",
+  "Employee",
+  "Days",
+  "Present",
+  "Absent",
+  "Paid Leave",
+  "Weekly Off",
+  "On Duty",
+  "Half Day",
+  "Paid Days",
+  "Monthly",
+  "Basic Payable",
+  "Allowance",
+  "Deduction",
+  "Net",
+  "Edit"
+],
+
       data.map(x => [
         x.id,
         x.name,
         x.days,
         x.present,
         x.absent,
+        x.paidLeave,
+        x.weeklyOff,
+        x.onDuty,
+        x.halfDay,
+        x.paidDays,
         money(x.salary),
         money(x.basic),
         money(x.allowance),
@@ -3433,10 +3444,12 @@ async function renderSlip() {
       '<b>Total Days:</b> ' + x.days +
       '<br>' +
 
-      '<b>Present Days:</b> ' + x.present +
-      '<br>' +
-
-      '<b>Absent Days:</b> ' + x.absent +
+      "<b>Present Days:</b> " + x.present + "<br>" +
+      "<b>Absent Days:</b> " + x.absent + "<br>" +
+      "<b>Paid Leave:</b> " + (x.paidLeave || 0) + "<br>" +
+      "<b>Weekly Off:</b> " + (x.weeklyOff || 0) + "<br>" +
+      "<b>On Duty:</b> " + (x.onDuty || 0) + "<br>" +
+      "<b>Half Day:</b> " + (x.halfDay || 0) + "<br>" +
 
       '</p>' +
 
