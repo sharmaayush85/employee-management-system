@@ -2965,8 +2965,10 @@ async function renderAttendance() {
     attendance = {};
 
     records.forEach(record => {
-      attendance[record.date + "_" + record.employee_id] =
-        record.status;
+      attendance[record.date + "_" + record.employee_id] = {
+        status: record.status,
+        id: record.id
+      }
     });
 
     const z = new Date(dt + "T00:00:00");
@@ -2985,7 +2987,8 @@ async function renderAttendance() {
     $("attTable").innerHTML = table(
       ["ID", "Employee", "Date", "Status", "Edit", "Delete"],
       employees.map(e => {
-        let s = attendance[dt + "_" + e.id];
+        let record = attendance[dt + "_" + e.id];
+        let s = record ? record.status : null;
 
         return [
           e.id,
@@ -2993,7 +2996,7 @@ async function renderAttendance() {
           dt,
           s ? code(s) + " - " + s : "Not Marked",
           '<button data-a="' + e.id + '">Edit</button>',
-          '<button class="red" data-r="' + e.id + '">Delete</button>'
+          '<button class="red" data-r="' + (record ? record.id : "") + '">Delete</button>'
         ];
       })
     );
